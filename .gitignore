@@ -1,0 +1,30 @@
+# Windows ignores from https://github.com/github/gitignore/commit/5a860949c0858da5fe6b2ff0e64bd9256c845614
+	# Windows image file caches
+	Thumbs.db
+	ehthumbs.db
+
+	# Folder config file
+	Desktop.ini
+
+	# Recycle Bin used on file shares
+	$RECYCLE.BIN/
+
+# OSX ignores from https://github.com/github/gitignore/commit/044043f5590e8018d0f51e668bfd7fbac30b57f6 - Commenting out all that duplicate pattern .*
+	#.DS_Store
+	#.AppleDouble
+	#.LSOverride
+	Icon
+
+	# Thumbnails
+	#._*
+
+	# Files that might appear on external disk
+	#.Spotlight-V100
+	#.Trashes
+
+# Linux ignores from https://github.com/github/gitignore/commit/91a1756d29131c38599af43e417b15a2340f7d6e
+	#.*
+	!.gitignore
+	*~
+
+# Custom ignores
