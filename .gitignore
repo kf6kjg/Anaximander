@@ -30,3 +30,4 @@ Icon
 ### Custom ignores
 *.exe
 *.obj
+doc/
