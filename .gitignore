@@ -32,3 +32,4 @@ Icon
 *.obj
 doc/
 *.lst
+src/aversioninfo.d

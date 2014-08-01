@@ -25,18 +25,43 @@
 * SOFTWARE.
 */
 
-import std.stdio;
-import std.getopt;
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+// Imports
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-const uint VER_MAJOR = 0;
-const uint VER_MINOR = 0;
-const uint VER_BUILD = 1;
+// Standard imports.  Keep sorted.
+import std.getopt;
+import std.stdio;
+
+// Local imports.  Keep sorted.
+import aversioninfo;
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+// Constants
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+// Globals
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// Tile paths
+const string gNewTilePath = "./newtiles"; /// The path for the tiles that yet need processing.
+const string gMapTilePath = "./maptiles"; /// The final output location for all finished tiles.
+const string gTempTilePath = "./maptiles.temp"; /// Staging ground for tiles.
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+// Functions
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int main(string[] args) {
 	writeln("Anaximander the Grid Cartographer at your service!");
 	
 	getopt(args,
-		"version|V", function void() {writefln(" Version %d.%d.%d", VER_MAJOR, VER_MINOR, VER_BUILD);}
+		"version|V", function void() {writefln(" Version %d", VERSION);}
 	);
 	
 	return 0;
