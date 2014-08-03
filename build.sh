@@ -17,8 +17,7 @@ echo Gathering libraries, if any...
 #if [ ! -e lib/FILE.zip ]; then ( cd lib; wget -O- http://SITE/FILE.zip | unzip - ); fi
 
 ## Compile the program
-echo Compiling...
-rdmd -m64 -Dddoc -odobj -cov -unittest -inline -w -Ilib --build-only \
-	src/anaximander.d
+echo Generating docs and compiling...
+rdmd -m64 -od. -Dddoc -cov -unittest -inline -w -Isrc -Ilib --build-only src/anaximander.d
 
 chmod u+x anaximander

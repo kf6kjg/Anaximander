@@ -31,7 +31,6 @@ if %needsextract%==1 (
 
 rem Compile the program
 if NOT %needsextract%==1 (
-	echo Compiling...
-	rdmd -m64 -Dddoc -odobj -cov -unittest -inline -w -Ilib --build-only ^
-		src/anaximander.d
+	echo Generating docs and compiling...
+	rdmd -m64 -od. -Dddoc -cov -unittest -inline -w -Isrc -Ilib --build-only src/anaximander.d
 )
