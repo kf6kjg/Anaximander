@@ -17,12 +17,8 @@ echo Gathering libraries, if any...
 #if [ ! -e lib/FILE.zip ]; then ( cd lib; wget -O- http://SITE/FILE.zip | unzip - ); fi
 
 ## Compile the program
-# Keep files in shell listing (alphanumerical) order
 echo Compiling...
-dmd -m64 -Dddoc -odobj -cov -unittest -inline -w \
-	src/anaximander.d \
-	src/atilegrabber.d \
-	src/atilezoomer.d \
-	src/aversioninfo.d \
+rdmd -m64 -Dddoc -odobj -cov -unittest -inline -w -Ilib --build-only \
+	src/anaximander.d
 
 chmod u+x anaximander

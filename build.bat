@@ -30,12 +30,8 @@ if %needsextract%==1 (
 )
 
 rem Compile the program
-rem  Keep files in shell listing (alphanumerical) order
 if NOT %needsextract%==1 (
 	echo Compiling...
-	dmd -m64 -Dddoc -odobj -cov -unittest -inline -w ^
-		src/anaximander.d ^
-		src/atilegrabber.d ^
-		src/atilezoomer.d ^
-		src/aversioninfo.d
+	rdmd -m64 -Dddoc -odobj -cov -unittest -inline -w -Ilib --build-only ^
+		src/anaximander.d
 )
