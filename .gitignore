@@ -33,3 +33,4 @@ Icon
 doc/
 *.lst
 src/aversioninfo.d
+lib/

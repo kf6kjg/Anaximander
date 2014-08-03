@@ -47,6 +47,8 @@ import aversioninfo;
 // Globals
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+const string gConfigFilePath = "./anaximander.ini"; /// Where in the world is the config file?
+
 // Tile paths
 const string gNewTilePath = "./newtiles"; /// The path for the tiles that yet need processing.
 const string gMapTilePath = "./maptiles"; /// The final output location for all finished tiles.
@@ -61,7 +63,8 @@ int main(string[] args) {
 	writeln("Anaximander the Grid Cartographer at your service!");
 	
 	getopt(args,
-		"version|V", function void() {writefln(" Version %d", VERSION);}
+		"version|V", function void() {writefln(" Version %d", VERSION);},
+		"gettiles", function void() {},
 	);
 	
 	return 0;
