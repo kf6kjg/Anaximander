@@ -15,6 +15,7 @@ rem Download the libraries and then complain to the user to extract them into th
 set needsextract=0
 if NOT EXIST lib mkdir lib
 cd lib
+echo Gathering libraries, if any...
 
 rem if NOT EXIST FILE.zip (
 rem 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://SITE/FILE.zip', '.\FILE.zip')"
@@ -23,14 +24,18 @@ rem )
 
 cd ..
 if %needsextract%==1 (
+	echo Requesting user to extract libraries...
 	explorer.exe lib
 	msg "%username%" Please extract the zip files here.
 )
 
 rem Compile the program
 rem  Keep files in shell listing (alphanumerical) order
-dmd -m64 -Dddoc -odobj -cov -unittest -inline -w ^
-	src/anaximander.d ^
-	src/atilegrabber.d ^
-	src/atilezoomer.d ^
-	src/aversioninfo.d ^
+if NOT %needsextract%==1 (
+	echo Compiling...
+	dmd -m64 -Dddoc -odobj -cov -unittest -inline -w ^
+		src/anaximander.d ^
+		src/atilegrabber.d ^
+		src/atilezoomer.d ^
+		src/aversioninfo.d
+)
