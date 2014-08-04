@@ -1,0 +1,10 @@
+{
+	"notes": [
+		"Valid parameters:",
+		"  new_tile_path: path to the folder where the updated tiles are stored.  Default is a folder named 'newtiles' in the current working directory.",
+		"  map_tile_path: path to the folder where the tiles are stored for delivery to the clients.  Default is a folder named 'maptiles' in the current working directory.",
+		"  temp_tile_path: path to the folder where the tiles are stored temporarily during a rebuild of the world tiles.  Default is a folder named 'maptiles.temp' in the current working directory.",
+		""
+	],
+	"temp_tile_path": "C:/Windows/Temp/Anaximander"
+}
