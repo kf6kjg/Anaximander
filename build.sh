@@ -14,7 +14,13 @@ sed "s/%VERSION%/$version/" src/aversioninfo.d.in > src/aversioninfo.d
 ## Get libraries
 mkdir lib
 echo Gathering libraries, if any...
-#if [ ! -e lib/FILE.zip ]; then ( cd lib; wget -O- http://SITE/FILE.zip | unzip - ); fi
+if [ ! -e lib/mysql-native ]; then (
+	cd lib
+	wget -O- https://github.com/rejectedsoftware/mysql-native/archive/v0.0.15.zip | unzip -d mysql-native -
+	mkdir mysql
+	cp mysql-native/source/mysql/* mysql/
+); fi
+#if [ ! -e lib/FILE ]; then ( cd lib; wget -O- http://SITE/FILE.zip | unzip - ); fi
 
 ## Compile the program
 echo Generating docs and compiling...

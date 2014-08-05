@@ -127,7 +127,7 @@ int main(string[] args) {
 	if (do_call_get_tiles) {
 		ATileGrabber grabber = new ATileGrabber(config_document, new_tile_path);
 		
-		grabber.getTileFromServer("http://example.com", 2, 4);
+		grabber.getRegionTiles();
 	}
 	
 	

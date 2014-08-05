@@ -29,6 +29,14 @@ if NOT EXIST curl.zip (
 	)
 )
 
+if NOT EXIST mysql-native.zip (
+	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'https://github.com/rejectedsoftware/mysql-native/archive/v0.0.15.zip', '.\mysql-native.zip')"
+	set needsextract=1
+) else if NOT EXIST mysql (
+	mkdir mysql
+	copy mysql-native-0.0.15\source\mysql\* mysql
+)
+
 rem if NOT EXIST FILE.zip (
 rem 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://SITE/FILE.zip', '.\FILE.zip')"
 rem 	set needsextract=1
