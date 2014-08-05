@@ -17,6 +17,18 @@ if NOT EXIST lib mkdir lib
 cd lib
 echo Gathering libraries, if any...
 
+if NOT EXIST curl.zip (
+	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://downloads.dlang.org/other/curl-7.28.1-devel-rainer.win64.zip', '.\curl.zip')"
+	set needsextract=1
+) else if NOT EXIST ..\libcurl.dll (
+	if EXIST libcurl.dll (
+		copy libcurl.dll ..\libcurl.dll
+	) else (
+		msg "%username%" It seems you have not extracted the curl zip file correctly.  Please make sure libcurl.dll is placed in this folder.
+		set needsextract=1
+	)
+)
+
 rem if NOT EXIST FILE.zip (
 rem 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://SITE/FILE.zip', '.\FILE.zip')"
 rem 	set needsextract=1

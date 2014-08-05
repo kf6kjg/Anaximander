@@ -27,10 +27,15 @@ Icon
 !.gitignore
 *~
 
+### Stuff produced by program test runs
+*.lst
+newtiles/
+maptiles/
+
 ### Custom ignores
 *.exe
 *.obj
 doc/
-*.lst
+*.dll
 src/aversioninfo.d
 lib/
