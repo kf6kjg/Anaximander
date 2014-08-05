@@ -93,7 +93,7 @@ void chatter(Args...)(string group, Args values) {
 }
 
 /// Alias for log(LOG_LEVEL.DEBUG, LOG_TYPE.NORMAL, group, values);
-void debug_log(Args...)(string group, Args values) {
+void debug_log(Args...)(string group, Args values){
 	log(LOG_LEVEL.DEBUG, LOG_TYPE.NORMAL, group, values);
 }
 

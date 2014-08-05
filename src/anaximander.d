@@ -52,13 +52,6 @@ const string LGRP_APP = "app";
 // Globals cause bugs,
 // Globals are quick and easy until the correct better way shows up.
 
-JSONValue[string] gConfigDocument;
-
-// Tile paths
-string gNewTilePath = "./newtiles"; /// The path for the tiles that yet need processing.
-string gMapTilePath = "./maptiles"; /// The final output location for all finished tiles.
-string gTempTilePath = "./maptiles.temp"; /// Staging ground for tiles.
-
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Functions
@@ -66,6 +59,13 @@ string gTempTilePath = "./maptiles.temp"; /// Staging ground for tiles.
 
 int main(string[] args) {
 	string config_file = "./anaximander.json"; /// Where in the world is the config file?
+	JSONValue[string] config_document;
+	
+	// Tile paths
+	string new_tile_path = "./newtiles"; /// The path for the tiles that yet need processing.
+	string map_tile_path = "./maptiles"; /// The final output location for all finished tiles.
+	string temp_tile_path = "./maptiles.temp"; /// Staging ground for tiles.
+	
 	bool do_call_get_tiles = false;
 	
 	// Process commandline parameters.
@@ -91,7 +91,7 @@ int main(string[] args) {
 		try {
 			JSONValue json_root = parseJSON(config_data);
 			assert(json_root.type() == JSON_TYPE.OBJECT);
-			gConfigDocument = json_root.object;
+			config_document = json_root.object;
 		}
 		catch (Exception) {
 			warn(LGRP_APP, "Invalid config file [", config_file, "]: Error parsing JSON format. Using defaults.");
@@ -102,21 +102,21 @@ int main(string[] args) {
 	}
 	
 	// Process config data.
-	if (gConfigDocument.length) {
+	if (config_document.length) {
 		debug_log(LGRP_APP, "Parsing values from config file.");
-		if ("new_tile_path" in gConfigDocument) {
-			gNewTilePath = gConfigDocument["new_tile_path"].str;
-			chatter(LGRP_APP, "Using new tile folder from config file: ", gNewTilePath);
+		if ("new_tile_path" in config_document) {
+			new_tile_path = config_document["new_tile_path"].str;
+			chatter(LGRP_APP, "Using new tile folder from config file: ", new_tile_path);
 		}
 		
-		if ("map_tile_path" in gConfigDocument) {
-			gMapTilePath = gConfigDocument["map_tile_path"].str;
-			chatter(LGRP_APP, "Using map tile folder from config file: ", gMapTilePath);
+		if ("map_tile_path" in config_document) {
+			map_tile_path = config_document["map_tile_path"].str;
+			chatter(LGRP_APP, "Using map tile folder from config file: ", map_tile_path);
 		}
 		
-		if ("temp_tile_path" in gConfigDocument) {
-			gTempTilePath = gConfigDocument["temp_tile_path"].str;
-			chatter(LGRP_APP, "Using temp tile folder from config file: ", gTempTilePath);
+		if ("temp_tile_path" in config_document) {
+			temp_tile_path = config_document["temp_tile_path"].str;
+			chatter(LGRP_APP, "Using temp tile folder from config file: ", temp_tile_path);
 		}
 	}
 	
