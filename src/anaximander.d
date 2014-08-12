@@ -82,11 +82,18 @@ int main(string[] args) {
 		"logging|L", &gLogLevel,
 		"quiet|q", function(){ gLogLevel = LOG_LEVEL.QUIET; },
 		"verbose|v", function(){ gLogLevel = LOG_LEVEL.VERBOSE; },
-		"version|V", function(){ stdout.writefln(" Version %d", VERSION); },
 	);
 	
 	// A friendly welcome.
 	info(LGRP_APP, "Anaximander the Grid Cartographer at your service!");
+	
+	// Some things just need to happen after the greeting!
+	getopt(args,
+		std.getopt.config.caseSensitive,
+		std.getopt.config.passThrough,
+		std.getopt.config.bundling,
+		"version|V", function(){ stdout.writefln(" Version %d", VERSION); },
+	);
 	
 	// Go attempt to read the config file.
 	try {
