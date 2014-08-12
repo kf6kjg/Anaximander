@@ -49,7 +49,7 @@ import alogger;
 // Constants
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-const string LGRP_APP = "tilegrabber";
+private const string LGRP_APP = "tilegrabber";
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

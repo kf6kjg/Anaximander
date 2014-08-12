@@ -45,7 +45,7 @@ import aversioninfo;
 // Constants
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-const string LGRP_APP = "app";
+private const string LGRP_APP = "app";
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

@@ -25,7 +25,7 @@ if NOT EXIST curl.zip (
 		copy libcurl.dll ..\libcurl.dll
 	) else (
 		msg "%username%" It seems you have not extracted the curl zip file correctly.  Please make sure libcurl.dll is placed in this folder.
-		set needsextract=1
+		exit /B
 	)
 )
 
@@ -47,10 +47,9 @@ if %needsextract%==1 (
 	echo Requesting user to extract libraries...
 	explorer.exe lib
 	msg "%username%" Please extract the zip files here.
+	exit /B
 )
 
 rem Compile the program
-if NOT %needsextract%==1 (
-	echo Generating docs and compiling...
-	rdmd -m64 -od. -Dddoc -cov -unittest -inline -w -Isrc -Ilib --build-only src/anaximander.d
-)
+echo Generating docs and compiling...
+rdmd -m64 -od. -Dddoc -cov -unittest -inline -w -Isrc -Ilib --build-only src/anaximander.d
