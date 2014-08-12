@@ -36,6 +36,7 @@ module atilegrabber;
 import std.file;
 import std.json;
 import std.net.curl;
+import std.path;
 import std.string;
 
 // Library imports.  Keep sorted.
@@ -65,6 +66,7 @@ public class ATileGrabber {
 	*/
 	void getRegionsFromDatabase(string connection_string) // *TODO: Should probably be private, and may want to be combined with getRegionTiles.
 		in {
+			scope(failure) err(LGRP_APP, "Invalid connection string passed to getRegionsFromDatabase.");
 			assert(connection_string.length > 0);
 		}
 		out {
@@ -118,12 +120,19 @@ public class ATileGrabber {
 	*/
 	void getTileFromServer(string url, uint x_coord, uint y_coord)
 		in {
+			scope(failure) err(LGRP_APP, "Invalid URL passed to getTileFromServer: '", url, "'");
 			assert(url.length > 0);
+			scope(failure) err(LGRP_APP, "URL must use http protocol: '", url, "'");
 			assert(url[0..7].toLower == "http://");
+			
+			scope(failure) err(LGRP_APP, "Invalid path passed to getTileFromServer: '", new_tile_path, "'");
 			assert(new_tile_path.length > 0);
+			assert(new_tile_path.isValidPath());
 		}
 		out {
 			string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1);
+			
+			scope(failure) err(LGRP_APP, "Failed to create tile from server. File: '", filename, "', URL: ", url);
 			assert(filename.exists());
 			assert(DirEntry(filename).size > 0);
 		}
@@ -139,10 +148,15 @@ public class ATileGrabber {
 	
 	this(JSONValue[string] config_document, string new_tile_path)
 		in {
+			scope(failure) err(LGRP_APP, "Invalid path passed to ctor: '", new_tile_path, "'");
 			assert(new_tile_path.length > 0);
+			assert(new_tile_path.isValidPath());
+			
+			scope(failure) err(LGRP_APP, "Key database_connection missing from config file!");
 			assert("database_connection" in config_document); // Required config entry.
 		}
 		out {
+			scope(failure) err(LGRP_APP, "Ctor failed to create new tile path folder!");
 			assert(new_tile_path.isDir());
 		}
 		body {
