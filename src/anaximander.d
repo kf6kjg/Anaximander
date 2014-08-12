@@ -132,6 +132,7 @@ int main(string[] args) {
 	
 	// If requested, gather tiles from regions.
 	if (do_call_get_tiles) {
+		debug_log("Got request to get tiles from the regions.");
 		ATileGrabber grabber = new ATileGrabber(config_document, new_tile_path);
 		
 		grabber.getRegionTiles();
