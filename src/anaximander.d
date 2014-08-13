@@ -38,6 +38,7 @@ import std.stdio;
 // Local imports.  Keep sorted.
 import alogger;
 import atilegrabber;
+import atilezoomer;
 import aversioninfo;
 
 
@@ -139,7 +140,8 @@ int main(string[] args) {
 	}
 	
 	
-	// Create the zoom levels.
+	// Create the ocean tile. Overwriting isn't much of an issue as this is trivial and fast - plus the temp folder should be empty.
+	createOceanTile(config_document, temp_tile_path);
 	
 	return 0;
 }

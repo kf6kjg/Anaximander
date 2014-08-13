@@ -37,6 +37,63 @@ if NOT EXIST mysql-native.zip (
 	copy mysql-native-0.0.15\source\mysql\* mysql
 )
 
+rem Requirement for DMagick
+if NOT EXIST ImageMagick.zip (
+	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://www.imagemagick.org/download/windows/ImageMagick-windows.zip', '.\ImageMagick.zip')"
+	set needsextract=1
+) else (
+	cd ImageMagick-*
+	if NOT EXIST VisualMagick\bin\CORE_RL_magick_.dll (
+		start VisualMagick\configure\configure.sln
+		
+		start Install-windows.txt
+		
+		msg "%username%" Please configure and compile ImageMagick using 64bit Dynamic Multithreaded default settings.
+		
+		cd ..
+		exit /B
+	) else (
+		if NOT EXIST ..\..\CORE_RL_magick_.dll (
+			copy VisualMagick\bin\CORE_RL_magick_.dll ..\..
+			copy VisualMagick\lib\CORE_RL_magick_.lib ..
+			
+			rem Keep these sorted!
+			copy VisualMagick\bin\CORE_RL_bzlib_.dll ..\..
+			copy VisualMagick\bin\CORE_RL_glib_.dll ..\..
+			copy VisualMagick\bin\CORE_RL_lcms_.dll ..\..
+			copy VisualMagick\bin\CORE_RL_lqr_.dll ..\..
+			copy VisualMagick\bin\CORE_RL_ttf_.dll ..\..
+			copy VisualMagick\bin\CORE_RL_zlib_.dll ..\..
+		)
+	)
+	cd ..
+)
+
+if NOT EXIST DMagick.zip (
+	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'https://github.com/MikeWey/DMagick/archive/ImageMagick_6.8.9.zip', '.\DMagick.zip')"
+	set needsextract=1
+) else if NOT EXIST DMagick.lib (
+	cd DMagick-ImageMagick_6.8.9
+	
+	rem implib is only needed for 32bit DLLs...  In this case we are 64bit all the way.
+	
+	make -f windows.mak
+	
+	if EXIST DMagick.lib (
+		echo Please ignore the above error regarding implib...
+		copy DMagick.lib ..
+	) else (
+		cd ..
+		exit /B
+	)
+	
+	mkdir ..\dmagick
+	xcopy /E dmagick ..\dmagick
+	
+	cd ..
+)
+
+
 rem if NOT EXIST FILE.zip (
 rem 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://SITE/FILE.zip', '.\FILE.zip')"
 rem 	set needsextract=1
@@ -52,4 +109,4 @@ if %needsextract%==1 (
 
 rem Compile the program
 echo Generating docs and compiling...
-rdmd -m64 -od. -Dddoc -cov -unittest -inline -w -Isrc -Ilib --build-only src/anaximander.d
+rdmd -w -od. --build-only -m64 -Dddoc -cov -unittest -Ilib lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
