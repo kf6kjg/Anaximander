@@ -24,6 +24,6 @@ if [ ! -e lib/mysql-native ]; then (
 
 ## Compile the program
 echo Generating docs and compiling...
-rdmd -m64 -od. -Dddoc -cov -unittest -inline -w -Isrc -Ilib --build-only src/anaximander.d
+rdmd -w -od. --build-only -m64 -Dddoc -cov -unittest -version=DMagick_No_Display -Ilib src\anaximander.d
 
 chmod u+x anaximander
