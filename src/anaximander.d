@@ -132,16 +132,22 @@ int main(string[] args) {
 		if ("new_tile_path" in config_document) {
 			new_tile_path = config_document["new_tile_path"].str;
 			chatter(LGRP_APP, "Using new tile folder from config file: ", new_tile_path);
+			scope(failure) err(LGRP_APP, "Invalid path in config file for key 'new_tile_path'.");
+			assert(new_tile_path.isValidPath());
 		}
 		
 		if ("map_tile_path" in config_document) {
 			map_tile_path = config_document["map_tile_path"].str;
 			chatter(LGRP_APP, "Using map tile folder from config file: ", map_tile_path);
+			scope(failure) err(LGRP_APP, "Invalid path in config file for key 'map_tile_path'.");
+			assert(map_tile_path.isValidPath());
 		}
 		
 		if ("temp_tile_path" in config_document) {
 			temp_tile_path = config_document["temp_tile_path"].str;
 			chatter(LGRP_APP, "Using temp tile folder from config file: ", temp_tile_path);
+			scope(failure) err(LGRP_APP, "Invalid path in config file for key 'temp_tile_path'.");
+			assert(temp_tile_path.isValidPath());
 		}
 	}
 	
