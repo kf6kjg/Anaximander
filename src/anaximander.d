@@ -33,6 +33,7 @@
 import std.file;
 import std.getopt;
 import std.json;
+import std.path;
 import std.stdio;
 
 // Local imports.  Keep sorted.
@@ -96,7 +97,20 @@ int main(string[] args) {
 		"version|V", function(){ stdout.writefln(" Version %d", VERSION); },
 	);
 	
+	// Verify the config path is sane.
+	if (!config_file.isValidPath()) {
+		err(LGRP_APP, "Invalid configuration file path: ", config_file);
+		return -1;
+	}
+	
+	// Normallize the config file path to the executable location if a relative path.
+	if (!config_file.isAbsolute()) {
+		config_file = buildNormalizedPath(thisExePath(), "..", config_file);
+		chatter(LGRP_APP, "Normallized config file path to: ", config_file);
+	}
+	
 	// Go attempt to read the config file.
+	chatter(LGRP_APP, "Attempting to read the config file...");
 	try {
 		auto config_data = config_file.readText();
 		try {
@@ -131,9 +145,25 @@ int main(string[] args) {
 		}
 	}
 	
+	// Normallize the paths if they are relative paths.
+	if (!new_tile_path.isAbsolute()) {
+		new_tile_path = buildNormalizedPath(thisExePath(), "..", new_tile_path);
+		chatter(LGRP_APP, "Normallized new tile folder path to: ", new_tile_path);
+	}
+	
+	if (!map_tile_path.isAbsolute()) {
+		map_tile_path = buildNormalizedPath(thisExePath(), "..", map_tile_path);
+		chatter(LGRP_APP, "Normallized map tile folder path to: ", map_tile_path);
+	}
+	
+	if (!temp_tile_path.isAbsolute()) {
+		temp_tile_path = buildNormalizedPath(thisExePath(), "..", temp_tile_path);
+		chatter(LGRP_APP, "Normallized  temp tile folder path to: ", temp_tile_path);
+	}
+	
 	// If requested, gather tiles from regions.
 	if (do_call_get_tiles) {
-		debug_log("Got request to get tiles from the regions.");
+		chatter("Got request to get tiles from the regions.");
 		ATileGrabber grabber = new ATileGrabber(config_document, new_tile_path);
 		
 		grabber.getRegionTiles();
