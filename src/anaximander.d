@@ -221,6 +221,9 @@ int main(string[] args) {
 	// Create the ocean tile. Overwriting isn't much of an issue as this is trivial and fast - plus the temp folder should be empty.
 	createOceanTile(config_document, temp_tile_path, filename_ext);
 	
+	// Organize the files into one place for the zoom level build.
+	gatherRegionTiles(region_data, temp_tile_path, new_tile_path, filename_format ~ "." ~ filename_ext);
+	
 	
 	// Move the temp folder onto the map folder, overwriting the folder.  This is to be as atomic as possible to help prevent read problems.. though there could still be some...
 	if (map_tile_path.exists()) {

@@ -31,11 +31,11 @@ module atilezoomer;
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // Standard imports.  Keep sorted.
-
 import std.file;
 import std.json;
 import std.math;
 import std.path;
+import std.parallelism;
 import std.string;
 
 // Library imports.  Keep sorted.
@@ -46,6 +46,7 @@ import dmagick.Image;
 
 // Local imports.  Keep sorted.
 import alogger;
+import aregiondata;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Constants
@@ -161,4 +162,51 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path, st
 		
 		chatter(LGRP_APP, "Saving ocean tile, colored ", bg_color, " to ", filename);
 		tile.write(filename);
+	}
+
+void gatherRegionTiles(RegionData[] region_data, string temp_tile_path, string new_tile_path, string filename_format)
+	in {
+		{
+			scope(failure) err(LGRP_APP, "Invalid path passed to gatherRegionTiles: '", temp_tile_path, "'");
+			assert(temp_tile_path.length > 0);
+			assert(temp_tile_path.isValidPath());
+			assert(temp_tile_path.isDir());
+		}
+		{
+			scope(failure) err(LGRP_APP, "Invalid path passed to gatherRegionTiles: '", new_tile_path, "'");
+			assert(new_tile_path.length > 0);
+			assert(new_tile_path.isValidPath());
+			assert(new_tile_path.isDir());
+		}
+		{
+			scope(failure) err(LGRP_APP, "Invalid file name format passed to gatherRegionTiles: '", filename_format, "'");
+			assert(filename_format.length > 0);
+		}
+		{
+			scope(failure) err(LGRP_APP, "File name format passed to gatherRegionTiles should have the file extension: '", filename_format, "'");
+			assert(filename_format.indexOf(".") >= 0);
+		}
+	}
+	out {
+		
+	}
+	body {
+		// Move the new tiles into the temp folder.
+		foreach (d; parallel(new_tile_path.dirEntries(SpanMode.shallow), 1)) {
+			// No need to worry about overwrite - there's not much there other than the ocean tile!
+			d.name.rename(buildNormalizedPath(temp_tile_path, d.name.baseName()));
+		}
+		
+		// Copy the valid region tiles into the temp folder.  Valid means that it is not already there, no overwriting, and that the region coord exists in the database.
+		foreach (region; parallel(region_data, 1)) {
+			string filename = filename_format.format(region.x, region.y, 1).baseName();
+			
+			string source = buildNormalizedPath(temp_tile_path, filename);
+			string dest = buildNormalizedPath(new_tile_path, filename);
+			
+			// If already there don't overwrite as what's there is the newest.
+			if (!dest.exists() && source.exists()) {
+				source.rename(dest);
+			}
+		}
 	}
