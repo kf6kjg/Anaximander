@@ -43,6 +43,7 @@ import mysql.connection;
 
 // Local imports.  Keep sorted.
 import alogger;
+import aregiondata;
 import atilegrabber;
 import atilezoomer;
 import aversioninfo;
@@ -219,6 +220,21 @@ int main(string[] args) {
 	
 	// Create the ocean tile. Overwriting isn't much of an issue as this is trivial and fast - plus the temp folder should be empty.
 	createOceanTile(config_document, temp_tile_path, filename_ext);
+	
+	
+	// Move the temp folder onto the map folder, overwriting the folder.  This is to be as atomic as possible to help prevent read problems.. though there could still be some...
+	if (map_tile_path.exists()) {
+		string old_map_tile_path = map_tile_path ~ ".old";
+		chatter(LGRP_APP, "Moving the old map folder to ", old_map_tile_path, ", then moving the temp in place of it.");
+		map_tile_path.rename(old_map_tile_path);
+		temp_tile_path.rename(map_tile_path);
+		chatter(LGRP_APP, "Removing the old map folder.");
+		old_map_tile_path.attemptRemoveRecurse();
+	}
+	else {
+		chatter(LGRP_APP, "Moving the temp folder to the map folder location as the latter doesn't exist.");
+		temp_tile_path.rename(map_tile_path);
+	}
 	
 	return 0;
 }
