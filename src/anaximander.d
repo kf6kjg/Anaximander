@@ -35,6 +35,10 @@ import std.getopt;
 import std.json;
 import std.path;
 import std.stdio;
+import std.string;
+
+// Library imports.  Keep sorted.
+import mysql.connection;
 
 // Local imports.  Keep sorted.
 import alogger;
@@ -70,6 +74,8 @@ int main(string[] args) {
 	string new_tile_path = "./newtiles"; /// The path for the tiles that yet need processing.
 	string map_tile_path = "./maptiles"; /// The final output location for all finished tiles.
 	string temp_tile_path = "./maptiles.temp"; /// Staging ground for tiles.
+	string filename_format = "%d-%d-%d";
+	string filename_ext = "jpg";
 	
 	bool do_call_get_tiles = false;
 	
@@ -119,35 +125,57 @@ int main(string[] args) {
 			config_document = json_root.object;
 		}
 		catch (Exception) {
-			warn(LGRP_APP, "Invalid config file [", config_file, "]: Error parsing JSON format. Using defaults.");
+			err(LGRP_APP, "Invalid config file [", config_file, "]: Error parsing JSON format. Cannot continue without config file due to required entries.");
+			return -1;
 		}
 	}
 	catch (Exception) {
-		warn(LGRP_APP, "Config file not found [", config_file, "]. Using defaults.");
+		err(LGRP_APP, "Config file not found [", config_file, "]. Cannot continue without config file due to required entries.");
+		return -1;
 	}
 	
 	// Process config data.
-	if (config_document.length) {
+	{
 		debug_log(LGRP_APP, "Parsing values from config file.");
-		if ("new_tile_path" in config_document) {
+		if ("new_tile_path" in config_document) { // Optional config entry.
 			new_tile_path = config_document["new_tile_path"].str;
 			chatter(LGRP_APP, "Using new tile folder from config file: ", new_tile_path);
 			scope(failure) err(LGRP_APP, "Invalid path in config file for key 'new_tile_path'.");
 			assert(new_tile_path.isValidPath());
 		}
 		
-		if ("map_tile_path" in config_document) {
+		if ("map_tile_path" in config_document) { // Optional config entry.
 			map_tile_path = config_document["map_tile_path"].str;
 			chatter(LGRP_APP, "Using map tile folder from config file: ", map_tile_path);
 			scope(failure) err(LGRP_APP, "Invalid path in config file for key 'map_tile_path'.");
 			assert(map_tile_path.isValidPath());
 		}
 		
-		if ("temp_tile_path" in config_document) {
+		if ("temp_tile_path" in config_document) { // Optional config entry.
 			temp_tile_path = config_document["temp_tile_path"].str;
 			chatter(LGRP_APP, "Using temp tile folder from config file: ", temp_tile_path);
 			scope(failure) err(LGRP_APP, "Invalid path in config file for key 'temp_tile_path'.");
 			assert(temp_tile_path.isValidPath());
+		}
+		
+		// Get the tile name format from the config file if set.
+		if ("tile_name_format" in config_document) { // Optional config entry.
+			filename_format = config_document["tile_name_format"].str;
+			chatter(LGRP_APP, "Using file format from config file: ", filename_format);
+		}
+		
+		if ("tile_file_type" in config_document) { // Optional config entry.
+			scope(failure) err(LGRP_APP, "Value for config key 'tile_file_type' MUST be a non-empty string!");
+			assert(config_document["tile_file_type"].type == JSON_TYPE.STRING);
+			assert(config_document["tile_file_type"].array.length > 0);
+			
+			filename_ext = config_document["tile_file_type"].str.toLower();
+			chatter(LGRP_APP, "Using file type from config file: ", filename_ext);
+		}
+		
+		{ // Required config entry.
+			scope(failure) err(LGRP_APP, "Key database_connection missing from config file!");
+			assert("database_connection" in config_document);
 		}
 	}
 	
@@ -164,20 +192,32 @@ int main(string[] args) {
 	
 	if (!temp_tile_path.isAbsolute()) {
 		temp_tile_path = buildNormalizedPath(thisExePath(), "..", temp_tile_path);
-		chatter(LGRP_APP, "Normallized  temp tile folder path to: ", temp_tile_path);
+		chatter(LGRP_APP, "Normallized temp tile folder path to: ", temp_tile_path);
 	}
+	
+	
+	// Get the list of active regions.
+	RegionData[] region_data = getRegionsFromDatabase(config_document["database_connection"].str);
+	// This has to be done every process because only the database only contains the master list of online regions.
+	
 	
 	// If requested, gather tiles from regions.
 	if (do_call_get_tiles) {
-		chatter("Got request to get tiles from the regions.");
-		ATileGrabber grabber = new ATileGrabber(config_document, new_tile_path);
-		
-		grabber.getRegionTiles();
+		chatter(LGRP_APP, "Got request to get tiles from the regions.");
+		getRegionTiles(region_data, new_tile_path, filename_format, filename_ext);
 	}
 	
+	// Create the temp folder, and if it exists make sure it's empty.
+	{
+		scope(failure) err(LGRP_APP, "Unable to create/modify requested temporary folder: ", temp_tile_path);
+		if (temp_tile_path.exists()) {
+			temp_tile_path.rmdirRecurse();
+		}
+		temp_tile_path.mkdirRecurse();
+	}
 	
 	// Create the ocean tile. Overwriting isn't much of an issue as this is trivial and fast - plus the temp folder should be empty.
-	createOceanTile(config_document, temp_tile_path);
+	createOceanTile(config_document, temp_tile_path, filename_ext);
 	
 	return 0;
 }

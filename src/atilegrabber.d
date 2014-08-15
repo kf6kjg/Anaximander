@@ -54,157 +54,138 @@ private const string LGRP_APP = "tilegrabber";
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-// Classes
+// Functions
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// TODO: review if this couldn't be collapsed to a single function.
-public class ATileGrabber {
-	// Public methods, keep sorted.
-	
-	/**
-	* Gets the list of regions from the server.
-	*/
-	void getRegionsFromDatabase(string connection_string) // *TODO: Should probably be private, and may want to be combined with getRegionTiles.
-		in {
-			scope(failure) err(LGRP_APP, "Invalid connection string passed to getRegionsFromDatabase.");
-			assert(connection_string.length > 0);
-		}
-		out {
+/**
+* Gets the list of regions from the server.
+*/
+RegionData[] getRegionsFromDatabase(string connection_string)
+	in {
+		scope(failure) err(LGRP_APP, "Invalid connection string passed to getRegionsFromDatabase.");
+		assert(connection_string.length > 0);
+	}
+	out {
+		
+	}
+	body {
+		// Open connection to the DB and get the records.
+		auto conn = new Connection(connection_string);
+		scope(exit) conn.close();
+		
+		RegionData[] region_data;
+		
+		// *TODO: If possible, check to see if the dirtytile (or whatever it's called) column exists.  If it dows, use it in a where clause to limit the number of rows returned.  Possible use for a stored function, as the flag needs to be cleared as well...
+		
+		auto cmd = Command(conn, "SELECT uuid, serverIP, serverHttpPort, locX, locY FROM regions");
+		ResultSet rs = cmd.execSQLResult();
+		region_data.length = rs.length;
+		debug_log(LGRP_APP, "SQL query returned ", region_data.length, " regions to get tiles from.");
+		
+		RegionData rd;
+		for (uint index = 0; index < region_data.length; ++index) {
+			rd.url = format("http://%s:%s/index.php?method=regionImage%s&forcerefresh=true", rs[index][1].toString(), rs[index][2].toString(), rs[index][0].toString().removechars("-"));
+			rd.x = rs[index][3].get!(uint);
+			rd.y = rs[index][4].get!(uint);
 			
+			region_data[index] = rd;
+			debug_log(LGRP_APP, "Got region info: ", rd);
 		}
-		body {
-			// Open connection to the DB and get the records.
-			auto conn = new Connection(connection_string);
-			scope(exit) conn.close();
-			
-			// *TODO: If possible, check to see if the dirtytile (or whatever it's called) column exists.  If it dows, use it in a where clause to limit the number of rows returned.  Possible use for a stored function, as the flag needs to be cleared as well...
-			
-			auto cmd = Command(conn, "SELECT uuid, serverIP, serverHttpPort, locX, locY FROM regions");
-			ResultSet rs = cmd.execSQLResult();
-			region_data.length = rs.length;
-			debug_log(LGRP_APP, "SQL query returned ", region_data.length, " regions to get tiles from.");
-			
-			RegionData rd;
-			for (uint index = 0; index < region_data.length; ++index) {
-				rd.url = format("http://%s:%s/index.php?method=regionImage%s&forcerefresh=true", rs[index][1].toString(), rs[index][2].toString(), rs[index][0].toString().removechars("-"));
-				rd.x = rs[index][3].get!(uint);
-				rd.y = rs[index][4].get!(uint);
-				
-				region_data[index] = rd;
-				debug_log(LGRP_APP, "Got region info: ", rd);
-			}
+		
+		return region_data;
+	}
+
+/**
+* Go download the region tiles.
+*/
+void getRegionTiles(RegionData[] region_data, string new_tile_path, string filename_format, string file_ext)
+	in {
+		{
+			scope(failure) err(LGRP_APP, "Invalid path passed to getRegionTiles: '", new_tile_path, "'");
+			assert(new_tile_path.length > 0);
+			assert(new_tile_path.isValidPath());
 		}
-	
-	/**
-	* Go download the region tiles.
-	*/
-	void getRegionTiles()
-		in {
-			
+		{
+			scope(failure) err(LGRP_APP, "Invalid file name format passed to getRegionTiles: '", filename_format, "'");
+			assert(filename_format.length > 0);
 		}
-		out {
-			
+		{
+			scope(failure) err(LGRP_APP, "Invalid file extention passed to getRegionTiles: '", file_ext, "'");
+			assert(file_ext.length > 0);
 		}
-		body {
-			RegionData rd;
-			for (uint index = 0; index < region_data.length; ++index) {
-				rd = region_data[index];
-				getTileFromServer(rd.url, rd.x, rd.y);
-			}
+	}
+	out {
+		
+	}
+	body {
+		RegionData rd;
+		for (uint index = 0; index < region_data.length; ++index) {
+			rd = region_data[index];
+			getTileFromServer(rd.url, rd.x, rd.y, new_tile_path, filename_format, file_ext);
 		}
-	
-	/**
-	* Grabs the tile image from the specified url and puts it in the predetermined file location.
-	*
-	* Note that this process takes about 1/2 second per call to a region, depending on the server and network speed.  Anything that can be done to reduce the number of calls is important!
-	*/
-	void getTileFromServer(string url, uint x_coord, uint y_coord)
-		in {
-			{
-				scope(failure) err(LGRP_APP, "Invalid URL passed to getTileFromServer: '", url, "'");
-				assert(url.length > 0);
-			}
-			{
-				scope(failure) err(LGRP_APP, "URL must use http protocol: '", url, "'");
-				assert(url[0..7].toLower == "http://");
-			}
-			{
-				scope(failure) err(LGRP_APP, "Invalid path passed to getTileFromServer: '", new_tile_path, "'");
-				assert(new_tile_path.length > 0);
-				assert(new_tile_path.isValidPath());
-			}
+	}
+
+/**
+* Grabs the tile image from the specified url and puts it in the predetermined file location.
+*
+* Note that this process takes about 1/2 second per call to a region, depending on the server and network speed.  Anything that can be done to reduce the number of calls is important!
+*/
+void getTileFromServer(string url, uint x_coord, uint y_coord, string new_tile_path, string filename_format, string file_ext)
+	in {
+		{
+			scope(failure) err(LGRP_APP, "Invalid URL passed to getTileFromServer: '", url, "'");
+			assert(url.length > 0);
 		}
-		out {
-			string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1);
-			
-			{
-				scope(failure) err(LGRP_APP, "Failed to create tile from server. File: '", filename, "', URL: ", url);
-				assert(filename.exists());
-				assert(DirEntry(filename).size > 0);
-			}
-			{
-				scope(failure) err(LGRP_APP, "File on disk has wrong magic number. Corrupted download? File: '", filename, "', URL: ", url);
-				ubyte[] correct_header = [0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00];
-				auto header = cast(ubyte[]) filename.read(correct_header.length);
-				assert(correct_header[0..1] == header[0..1]); // First two bytes are a constant.  Next two are not, so I ignore them.
-				assert(correct_header[4..$] == header[4..$]); // From the 5th byte to the null after "JFIF" everything is constant.
-			}
+		{
+			scope(failure) err(LGRP_APP, "URL must use http protocol: '", url, "'");
+			assert(url[0..7].toLower == "http://");
 		}
-		body {
-			string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1);
-			chatter(LGRP_APP, "Grabbing tile from ", url, " and writing to ", filename);
-			download(url, filename);
+		{
+			scope(failure) err(LGRP_APP, "Invalid path passed to getTileFromServer: '", new_tile_path, "'");
+			assert(new_tile_path.length > 0);
+			assert(new_tile_path.isValidPath());
 		}
-	
-	// Public properties, keep sorted.
-	
-	// Public ctors, keep sorted.
-	
-	this(JSONValue[string] config_document, string new_tile_path)
-		in {
-			{
-				scope(failure) err(LGRP_APP, "Invalid path passed to ctor: '", new_tile_path, "'");
-				assert(new_tile_path.length > 0);
-				assert(new_tile_path.isValidPath());
-			}
-			{
-				scope(failure) err(LGRP_APP, "Key database_connection missing from config file!");
-				assert("database_connection" in config_document); // Required config entry.
-			}
+		{
+			scope(failure) err(LGRP_APP, "Invalid file name format passed to getTileFromServer: '", filename_format, "'");
+			assert(filename_format.length > 0);
 		}
-		out {
-			scope(failure) err(LGRP_APP, "Ctor failed to create new tile path folder!");
-			assert(new_tile_path.isDir());
+		{
+			scope(failure) err(LGRP_APP, "Invalid file extention passed to getTileFromServer: '", file_ext, "'");
+			assert(file_ext.length > 0);
 		}
-		body {
-			debug_log(LGRP_APP, "Tile grabber ctor'd");
-			
-			// Make sure the needed directory is there!
-			this.new_tile_path = new_tile_path;
-			if (!new_tile_path.exists()) {
-				mkdirRecurse(new_tile_path);
-			}
-			
-			// Get the tile name format from the config file if set.
-			if ("tile_name_format" in config_document) { // Optional config entry.
-				filename_format = config_document["tile_name_format"].str;
-				chatter(LGRP_APP, "Using file format from config file: ", filename_format);
-			}
-			
-			// Get the regions.
-			getRegionsFromDatabase(config_document["database_connection"].str);
+	}
+	out {
+		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1);
+		
+		{
+			scope(failure) err(LGRP_APP, "Failed to create tile from server. File: '", filename, "', URL: ", url);
+			assert(filename.exists());
+			assert(DirEntry(filename).size > 0);
 		}
-	
-	// Privates, keep sorted.
-	private string filename_format = "%d-%d-%d.jpg";
-	private string new_tile_path;
-	private RegionData region_data[];
-}
+		{
+			scope(failure) err(LGRP_APP, "File on disk has wrong magic number. Corrupted download? File: '", filename, "', URL: ", url);
+			ubyte[] correct_header = [0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00];
+			auto header = cast(ubyte[]) filename.read(correct_header.length);
+			assert(correct_header[0..1] == header[0..1]); // First two bytes are a constant.  Next two are not, so I ignore them.
+			assert(correct_header[4..$] == header[4..$]); // From the 5th byte to the null after "JFIF" everything is constant.
+		}
+	}
+	body {
+		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1) ~ "." ~ file_ext;
+		chatter(LGRP_APP, "Grabbing tile from ", url, " and writing to ", filename, ".", file_ext);
+		download(url, filename);
+		// TODO: Issue 7: verify that it was in the specified format, and convert it if it wasn't.
+	}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+// Classes/Structs
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**
 * Stored region info as comes from the DB, with slight modification.
 */
-private struct RegionData {
+struct RegionData {
 	string url; // = format("http://%s:%s/index.php?method=regionImage%s&forcerefresh=true", serverIP, serverHttpPort, serverUUID.removechars("-"))
 	uint x;
 	uint y;

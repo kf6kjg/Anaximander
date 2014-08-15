@@ -56,14 +56,13 @@ private const string LGRP_APP = "tilegrabber";
 private const uint IMG_WIDTH = 256;
 private const uint IMG_HEIGHT = 256;
 private const ubyte[] OCEAN_COLOR = [ 1, 11, 252 ];
-private const string TILE_FILE_EXTENSION = "jpg";
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Functions
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /// Creates the ocean tile image that will be used for all missing tiles.
-void createOceanTile(JSONValue[string] config_document, string map_tile_path)
+void createOceanTile(JSONValue[string] config_document, string map_tile_path, string file_ext)
 	in {
 		{
 			scope(failure) err(LGRP_APP, "Invalid path passed to createOceanTile: '", map_tile_path, "'");
@@ -71,7 +70,10 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path)
 			assert(map_tile_path.isValidPath());
 			assert(map_tile_path.isDir());
 		}
-		
+		{
+			scope(failure) err(LGRP_APP, "Invalid file extention passed to createOceanTile: '", file_ext, "'");
+			assert(file_ext.length > 0);
+		}
 		{
 			scope(failure) err(LGRP_APP, "Key ocean_tile_name missing from config file!");
 			assert("ocean_tile_name" in config_document); // Required config entry.
@@ -87,11 +89,7 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path)
 		}
 	}
 	out {
-		string file_ext = TILE_FILE_EXTENSION;
-		if ("tile_file_type" in config_document) { // Optional config entry.
-			file_ext = config_document["tile_file_type"].str.toLower();
-		}
-		string filename = map_tile_path ~ "/" ~ config_document["ocean_tile_name"].str ~ "." ~ file_ext;
+		string filename = map_tile_path ~ "/" ~ config_document["ocean_tile_name"].str ~ "." ~ file_ext.toLower();
 		
 		{
 			scope(failure) err(LGRP_APP, "Function failed to create ocean tile at ", filename);
@@ -129,7 +127,7 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path)
 	body {
 		ubyte[3] bg_color;
 		
-		string file_ext = TILE_FILE_EXTENSION;
+		file_ext = file_ext.toLower();
 		
 		if ("ocean_color" in config_document) { // Optional config entry.
 			scope(failure) err(LGRP_APP, "Value for config key 'ocean_color' MUST be an array of three (3) positive integers!");
@@ -151,15 +149,6 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path)
 			bg_color[0] = OCEAN_COLOR[0];
 			bg_color[1] = OCEAN_COLOR[1];
 			bg_color[2] = OCEAN_COLOR[2];
-		}
-		
-		if ("tile_file_type" in config_document) { // Optional config entry.
-			scope(failure) err(LGRP_APP, "Value for config key 'tile_file_type' MUST be a non-empty string!");
-			assert(config_document["tile_file_type"].type == JSON_TYPE.STRING);
-			assert(config_document["tile_file_type"].array.length > 0);
-			
-			file_ext = config_document["tile_file_type"].str.toLower();
-			chatter(LGRP_APP, "Using file type from config file: ", file_ext);
 		}
 		
 		debug_log(LGRP_APP, "Creating background color.");
