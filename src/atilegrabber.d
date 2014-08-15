@@ -156,7 +156,7 @@ void getTileFromServer(string url, uint x_coord, uint y_coord, string new_tile_p
 		}
 	}
 	out {
-		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1);
+		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1) ~ "." ~ file_ext;
 		
 		{
 			scope(failure) err(LGRP_APP, "Failed to create tile from server. File: '", filename, "', URL: ", url);
