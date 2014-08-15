@@ -1,14 +1,15 @@
 {
 	"notes": [
 		"Valid parameters:",
-		"  new_tile_path: OPTIONAL path to the folder where the updated tiles are stored.  Default is a folder named 'newtiles' in the current working directory.",
-		"  map_tile_path: OPTIONAL path to the folder where the tiles are stored for delivery to the clients.  Default is a folder named 'maptiles' in the current working directory.",
-		"  temp_tile_path: OPTIONAL path to the folder where the tiles are stored temporarily during a rebuild of the world tiles.  Default is a folder named 'maptiles.temp' in the current working directory.",
-		"  tile_name_format: OPTIONAL a string representing the printf-formating codes for a filename, with extension, that will be used for all tiles.  Three integers are passed to the formatter: region x, region y, zoom level.  Default is '%d-%d-%d.jpg'.",
-		"  database_connection: OPTIONAL the grid database connection string. REQUIRED if the --gettiles parameter is set.",
+		"  database_connection: REQUIRED the grid database connection string.",
 		"  ocean_tile_name: REQUIRED the name of the ocean tile without the extension.  Must not have any characters that would make it an invalid file name.",
-		"  ocean_color: OPTIONAL the color of the ocean, expressed as an array of red, green, and blue in a range from 0 to 255.  The default is: [ 1, 11, 252 ]",
+		
+		"  map_tile_path: OPTIONAL path to the folder where the tiles are stored for delivery to the clients.  Default is a folder named 'maptiles' in the current working directory.",
+		"  new_tile_path: OPTIONAL path to the folder where the updated tiles are stored.  Default is a folder named 'newtiles' in the current working directory.",
+		"  temp_tile_path: OPTIONAL path to the folder where the tiles are stored temporarily during a rebuild of the world tiles.  Default is a folder named 'maptiles.temp' in the current working directory.",
+		"  tile_name_format: OPTIONAL a string representing the printf-formating codes for a filename, without extension, that will be used for all tiles.  Three integers are passed to the formatter: region x, region y, zoom level.  Default is '%d-%d-%d'.",
 		"  tile_file_type: OPTIONAL the file type of the saved image tiles.  Available options: PNG, JPG, JPEG, TIFF, JP2, GIF, and jsut about any other format supported by ImageMagick.  Default is JPG.",
+		"  ocean_color: OPTIONAL the color of the ocean, expressed as an array of red, green, and blue in a range from 0 to 255.  The default is: [ 1, 11, 252 ]",
 		""
 	],
 	"ocean_tile_name": "ocean",
