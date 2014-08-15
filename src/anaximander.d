@@ -30,6 +30,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // Standard imports.  Keep sorted.
+import core.thread;
 import std.file;
 import std.getopt;
 import std.json;
@@ -211,7 +212,7 @@ int main(string[] args) {
 	{
 		scope(failure) err(LGRP_APP, "Unable to create/modify requested temporary folder: ", temp_tile_path);
 		if (temp_tile_path.exists()) {
-			temp_tile_path.rmdirRecurse();
+			temp_tile_path.attemptRemoveRecurse();
 		}
 		temp_tile_path.mkdirRecurse();
 	}
@@ -220,4 +221,22 @@ int main(string[] args) {
 	createOceanTile(config_document, temp_tile_path, filename_ext);
 	
 	return 0;
+}
+
+void attemptRemoveRecurse(string path) {
+	uint retry_count = 10;
+	
+	do {
+		try {
+			path.rmdirRecurse();
+		}
+		catch (Exception e) {
+			warn(LGRP_APP, "Failure attempting to remove ", path, ", trying again.");
+			Thread.sleep(dur!("msecs")(500));
+		}
+	} while (path.exists() && retry_count > 0);
+	
+	if (retry_count == 0) {
+		err(LGRP_APP, "Permanent failure attempting to remove ", path);
+	}
 }
