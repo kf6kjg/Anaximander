@@ -33,10 +33,12 @@ module atilegrabber;
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // Standard imports.  Keep sorted.
+import std.datetime;
 import std.file;
 import std.json;
 import std.net.curl;
 import std.path;
+import std.parallelism;
 import std.string;
 
 // Library imports.  Keep sorted.
@@ -119,11 +121,13 @@ void getRegionTiles(RegionData[] region_data, string new_tile_path, string filen
 		
 	}
 	body {
-		RegionData rd;
-		for (uint index = 0; index < region_data.length; ++index) {
-			rd = region_data[index];
+		StopWatch sw;
+		sw.start();
+		foreach (rd; parallel(region_data, 1)) {
 			getTileFromServer(rd.url, rd.x, rd.y, new_tile_path, filename_format, file_ext);
 		}
+		sw.stop();
+		chatter(LGRP_APP, "Download took ", sw.peek().seconds, " seconds for ", region_data.length, " regions, resulting in ", cast(double)(sw.peek().seconds) / region_data.length, " seconds per region on average.");
 	}
 
 /**
@@ -173,7 +177,7 @@ void getTileFromServer(string url, uint x_coord, uint y_coord, string new_tile_p
 	}
 	body {
 		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1) ~ "." ~ file_ext;
-		chatter(LGRP_APP, "Grabbing tile from ", url, " and writing to ", filename, ".", file_ext);
+		chatter(LGRP_APP, "Grabbing tile from ", url, " and writing to ", filename);
 		download(url, filename);
 		// TODO: Issue 7: verify that it was in the specified format, and convert it if it wasn't.
 	}
