@@ -44,6 +44,7 @@ import mysql.connection;
 
 // Local imports.  Keep sorted.
 import alogger;
+import aregiondata;
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -176,17 +177,3 @@ void getTileFromServer(string url, uint x_coord, uint y_coord, string new_tile_p
 		download(url, filename);
 		// TODO: Issue 7: verify that it was in the specified format, and convert it if it wasn't.
 	}
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-// Classes/Structs
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-/**
-* Stored region info as comes from the DB, with slight modification.
-*/
-struct RegionData {
-	string url; // = format("http://%s:%s/index.php?method=regionImage%s&forcerefresh=true", serverIP, serverHttpPort, serverUUID.removechars("-"))
-	uint x;
-	uint y;
-}
