@@ -59,7 +59,6 @@ private const string LGRP_APP = "tilegrabber";
 
 private const uint IMG_WIDTH = 256;
 private const uint IMG_HEIGHT = 256;
-private const ubyte[] OCEAN_COLOR = [ 1, 11, 252 ];
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -67,8 +66,14 @@ private const ubyte[] OCEAN_COLOR = [ 1, 11, 252 ];
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /// Creates the ocean tile image that will be used for all missing tiles.
-void createOceanTile(JSONValue[string] config_document, string map_tile_path, string file_ext)
+void createOceanTile(ubyte[3] ocean_color, string map_tile_path, string ocean_tile_file_name, string file_ext)
 	in {
+		{
+			scope(failure) err(LGRP_APP, "Invalid ocean color passed to createOceanTile: ", ocean_color);
+			assert(ocean_color[0] <= 255);
+			assert(ocean_color[1] <= 255);
+			assert(ocean_color[2] <= 255);
+		}
 		{
 			scope(failure) err(LGRP_APP, "Invalid path passed to createOceanTile: '", map_tile_path, "'");
 			assert(map_tile_path.length > 0);
@@ -76,21 +81,13 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path, st
 			assert(map_tile_path.isDir());
 		}
 		{
+			scope(failure) err(LGRP_APP, "Invalid ocean tile file name passed to createOceanTile: '", ocean_tile_file_name, "'");
+			assert(ocean_tile_file_name.length > 0);
+			assert(ocean_tile_file_name.isValidFilename());
+		}
+		{
 			scope(failure) err(LGRP_APP, "Invalid file extention passed to createOceanTile: '", file_ext, "'");
 			assert(file_ext.length > 0);
-		}
-		{
-			scope(failure) err(LGRP_APP, "Key ocean_tile_name missing from config file!");
-			assert("ocean_tile_name" in config_document); // Required config entry.
-		}
-		{
-			scope(failure) err(LGRP_APP, "Value for config file key 'ocean_tile_name' is not a string!");
-			assert(config_document["ocean_tile_name"].type() == JSON_TYPE.STRING);
-		}
-		{
-			scope(failure) err(LGRP_APP, "Value for config file key 'ocean_tile_name' is not a valid file name!");
-			assert(config_document["ocean_tile_name"].str.length > 0);
-			assert(config_document["ocean_tile_name"].str.isValidFilename());
 		}
 	}
 	out {
@@ -130,41 +127,17 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path, st
 		}
 	}
 	body {
-		ubyte[3] bg_color;
-		
 		file_ext = file_ext.toLower();
 		
-		if ("ocean_color" in config_document) { // Optional config entry.
-			scope(failure) err(LGRP_APP, "Value for config key 'ocean_color' MUST be an array of three (3) positive integers!");
-			assert(config_document["ocean_color"].type == JSON_TYPE.ARRAY);
-			assert(config_document["ocean_color"].array.length == 3);
-			assert(config_document["ocean_color"].array[0].type == JSON_TYPE.INTEGER);
-			assert(config_document["ocean_color"].array[0].integer() >= 0);
-			assert(config_document["ocean_color"].array[1].type == JSON_TYPE.INTEGER);
-			assert(config_document["ocean_color"].array[1].integer() >= 0);
-			assert(config_document["ocean_color"].array[2].type == JSON_TYPE.INTEGER);
-			assert(config_document["ocean_color"].array[2].integer() >= 0);
-			
-			bg_color[0] = cast(ubyte)(config_document["ocean_color"].array[0].integer());
-			bg_color[1] = cast(ubyte)(config_document["ocean_color"].array[1].integer());
-			bg_color[2] = cast(ubyte)(config_document["ocean_color"].array[2].integer());
-			chatter(LGRP_APP, "Using ocean color from config file: ", bg_color);
-		}
-		else {
-			bg_color[0] = OCEAN_COLOR[0];
-			bg_color[1] = OCEAN_COLOR[1];
-			bg_color[2] = OCEAN_COLOR[2];
-		}
-		
 		debug_log(LGRP_APP, "Creating background color.");
-		Color background_color =  new ColorRGB(bg_color[0], bg_color[1], bg_color[2], 255);
+		Color background_color =  new ColorRGB(ocean_color[0], ocean_color[1], ocean_color[2], 255);
 		
 		debug_log(LGRP_APP, "Creating tile.");
 		Image tile = new Image(Geometry(IMG_WIDTH, IMG_HEIGHT), background_color);
 		
-		string filename = map_tile_path ~ "/" ~ config_document["ocean_tile_name"].str ~ "." ~ file_ext;
+		string filename = map_tile_path ~ "/" ~ ocean_tile_file_name ~ "." ~ file_ext;
 		
-		chatter(LGRP_APP, "Saving ocean tile, colored ", bg_color, " to ", filename);
+		chatter(LGRP_APP, "Saving ocean tile, colored ", ocean_color, " to ", filename);
 		tile.write(filename);
 	}
 
@@ -199,7 +172,7 @@ void gatherRegionTiles(RegionData[] region_data, string temp_tile_path, string n
 		}
 	}
 	out {
-		
+		// Nothing to check as it is not guaranteed that ANY files will exist: the most degenerate valid case is that the grid has no regions.
 	}
 	body {
 		// Move the new tiles into the temp folder.
@@ -243,7 +216,7 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 		}
 	}
 	out {
-		
+		// Nothing to check as it is not guaranteed that ANY files will exist: the most degenerate valid case is that the grid has no regions.
 	}
 	body {
 		StopWatch sw;

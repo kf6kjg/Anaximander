@@ -58,14 +58,6 @@ private const string LGRP_APP = "app";
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-// Globals
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-// Globals are evil,
-// Globals cause bugs,
-// Globals are quick and easy until the correct better way shows up.
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Functions
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -73,13 +65,16 @@ int main(string[] args) {
 	string config_file = "./anaximander.json"; /// Where in the world is the config file?
 	JSONValue[string] config_document;
 	
-	// Tile paths
+	// Optional config entries with default values.
 	string new_tile_path = "./newtiles"; /// The path for the tiles that yet need processing.
 	string map_tile_path = "./maptiles"; /// The final output location for all finished tiles.
 	string temp_tile_path = "./maptiles.temp"; /// Staging ground for tiles.
 	string filename_format = "%d-%d-%d";
 	string filename_ext = "jpg";
+	ubyte[3] ocean_color = [ 1, 11, 252 ];
+	uint max_zoom_level = 7;
 	
+	// Track whether or not the download process needs to happen.
 	bool do_call_get_tiles = false;
 	
 	StopWatch sw;
@@ -143,6 +138,8 @@ int main(string[] args) {
 	// Process config data.
 	{
 		debug_log(LGRP_APP, "Parsing values from config file.");
+		
+		// Get the new tile folder path
 		if ("new_tile_path" in config_document) { // Optional config entry.
 			new_tile_path = config_document["new_tile_path"].str;
 			chatter(LGRP_APP, "Using new tile folder from config file: ", new_tile_path);
@@ -150,6 +147,7 @@ int main(string[] args) {
 			assert(new_tile_path.isValidPath());
 		}
 		
+		// Get the map tile folder path
 		if ("map_tile_path" in config_document) { // Optional config entry.
 			map_tile_path = config_document["map_tile_path"].str;
 			chatter(LGRP_APP, "Using map tile folder from config file: ", map_tile_path);
@@ -157,6 +155,7 @@ int main(string[] args) {
 			assert(map_tile_path.isValidPath());
 		}
 		
+		// Get the temp tile folder path
 		if ("temp_tile_path" in config_document) { // Optional config entry.
 			temp_tile_path = config_document["temp_tile_path"].str;
 			chatter(LGRP_APP, "Using temp tile folder from config file: ", temp_tile_path);
@@ -170,6 +169,7 @@ int main(string[] args) {
 			chatter(LGRP_APP, "Using file format from config file: ", filename_format);
 		}
 		
+		// Get the tile file type, wich doubles as the file extention.
 		if ("tile_file_type" in config_document) { // Optional config entry.
 			scope(failure) err(LGRP_APP, "Value for config key 'tile_file_type' MUST be a non-empty string!");
 			assert(config_document["tile_file_type"].type == JSON_TYPE.STRING);
@@ -179,9 +179,61 @@ int main(string[] args) {
 			chatter(LGRP_APP, "Using file type from config file: ", filename_ext);
 		}
 		
+		// Verify the database connection string.
 		{ // Required config entry.
 			scope(failure) err(LGRP_APP, "Key database_connection missing from config file!");
 			assert("database_connection" in config_document);
+		}
+		{
+			scope(failure) err(LGRP_APP, "Value for config file key ' database_connection' must be a string!");
+			assert(config_document["database_connection"].type() == JSON_TYPE.STRING);
+		}
+		
+		// Get the ocean color.
+		if ("ocean_color" in config_document) { // Optional config entry.
+			scope(failure) err(LGRP_APP, "Value for config key 'ocean_color' MUST be an array of three (3) integers, each with a value in the range 0 to 255!");
+			assert(config_document["ocean_color"].type == JSON_TYPE.ARRAY);
+			assert(config_document["ocean_color"].array.length == 3);
+			assert(config_document["ocean_color"].array[0].type == JSON_TYPE.INTEGER);
+			assert(config_document["ocean_color"].array[0].integer() >= 0);
+			assert(config_document["ocean_color"].array[0].integer() <= 255);
+			assert(config_document["ocean_color"].array[1].type == JSON_TYPE.INTEGER);
+			assert(config_document["ocean_color"].array[1].integer() >= 0);
+			assert(config_document["ocean_color"].array[1].integer() <= 255);
+			assert(config_document["ocean_color"].array[2].type == JSON_TYPE.INTEGER);
+			assert(config_document["ocean_color"].array[2].integer() >= 0);
+			assert(config_document["ocean_color"].array[2].integer() <= 255);
+			
+			ocean_color[0] = cast(ubyte)(config_document["ocean_color"].array[0].integer());
+			ocean_color[1] = cast(ubyte)(config_document["ocean_color"].array[1].integer());
+			ocean_color[2] = cast(ubyte)(config_document["ocean_color"].array[2].integer());
+			chatter(LGRP_APP, "Using ocean color from config file: ", ocean_color);
+		}
+		
+		// Verify the ocean tile name.
+		{ // Required config entry.
+			scope(failure) err(LGRP_APP, "Key ocean_tile_name missing from config file!");
+			assert("ocean_tile_name" in config_document);
+		}
+		{
+			scope(failure) err(LGRP_APP, "Value for config file key 'ocean_tile_name' must be a string!");
+			assert(config_document["ocean_tile_name"].type() == JSON_TYPE.STRING);
+		}
+		{
+			scope(failure) err(LGRP_APP, "Value for config file key 'ocean_tile_name' must be a valid file name!");
+			assert(config_document["ocean_tile_name"].str.length > 0);
+			assert(config_document["ocean_tile_name"].str.isValidFilename());
+		}
+		
+		// Get the maximum zoom level that will be generated.
+		if ("highest_zoom_level" in config_document) { // Optional config entry.
+			scope(failure) err(LGRP_APP, "Value for config key 'highest_zoom_level' MUST be a positive integer number!");
+			assert(config_document["highest_zoom_level"].type == JSON_TYPE.INTEGER);
+			assert(config_document["highest_zoom_level"].integer() >= 0);
+			
+			max_zoom_level = config_document["ocean_color"].array[0].integer();
+			
+			chatter(LGRP_APP, "Using highest zoom level from config file: ", max_zoom_level);
 		}
 	}
 	
@@ -223,13 +275,13 @@ int main(string[] args) {
 	}
 	
 	// Create the ocean tile. Overwriting isn't much of an issue as this is trivial and fast - plus the temp folder should be empty.
-	createOceanTile(config_document, temp_tile_path, filename_ext);
+	createOceanTile(ocean_color, temp_tile_path, config_document["ocean_tile_name"].str, filename_ext);
 	
 	// Organize the files into one place for the zoom level build.
 	gatherRegionTiles(region_data, temp_tile_path, new_tile_path, map_tile_path, filename_format ~ "." ~ filename_ext);
 	
 	// Create the zoom levels.
-	createZoomLevels(region_data, 7, new_tile_path, temp_tile_path, filename_format ~ "." ~ filename_ext);
+	createZoomLevels(region_data, max_zoom_level, new_tile_path, temp_tile_path, filename_format ~ "." ~ filename_ext);
 	
 	// Move the temp folder onto the map folder, overwriting the folder.  This is to be as atomic as possible to help prevent read problems.. though there could still be some...
 	if (map_tile_path.exists()) {
