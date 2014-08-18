@@ -31,6 +31,7 @@
 
 // Standard imports.  Keep sorted.
 import core.thread;
+import std.datetime;
 import std.file;
 import std.getopt;
 import std.json;
@@ -80,6 +81,9 @@ int main(string[] args) {
 	string filename_ext = "jpg";
 	
 	bool do_call_get_tiles = false;
+	
+	StopWatch sw;
+	sw.start();
 	
 	// Process commandline parameters.
 	getopt(args,
@@ -238,6 +242,9 @@ int main(string[] args) {
 		chatter(LGRP_APP, "Moving the temp folder to the map folder location as the latter doesn't exist.");
 		temp_tile_path.rename(map_tile_path);
 	}
+	
+	sw.stop();
+	info(LGRP_APP, "Program took ", sw.peek().seconds, " seconds.");
 	
 	return 0;
 }
