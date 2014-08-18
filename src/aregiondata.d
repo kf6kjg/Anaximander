@@ -57,5 +57,4 @@ struct RegionData {
 	string url; // = format("http://%s:%s/index.php?method=regionImage%s&forcerefresh=true", serverIP, serverHttpPort, serverUUID.removechars("-"))
 	uint x;
 	uint y;
-	Image tile;
 }
