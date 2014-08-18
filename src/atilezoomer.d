@@ -91,7 +91,7 @@ void createOceanTile(ubyte[3] ocean_color, string map_tile_path, string ocean_ti
 		}
 	}
 	out {
-		string filename = map_tile_path ~ "/" ~ config_document["ocean_tile_name"].str ~ "." ~ file_ext.toLower();
+		string filename = map_tile_path ~ "/" ~ ocean_tile_file_name ~ "." ~ file_ext.toLower();
 		
 		{
 			scope(failure) err(LGRP_APP, "Function failed to create ocean tile at ", filename);
@@ -108,22 +108,10 @@ void createOceanTile(ubyte[3] ocean_color, string map_tile_path, string ocean_ti
 			byte[3] pixels;
 			tile.exportPixels(Geometry(1,1, 10,10), pixels, "RGB");
 			// test it
-			ubyte[3] correct_color;
 			
-			if ("ocean_color" in config_document) { // Optional config entry.
-				correct_color[0] = cast(ubyte)(config_document["ocean_color"].array[0].integer());
-				correct_color[1] = cast(ubyte)(config_document["ocean_color"].array[1].integer());
-				correct_color[2] = cast(ubyte)(config_document["ocean_color"].array[2].integer());
-			}
-			else {
-				correct_color[0] = OCEAN_COLOR[0];
-				correct_color[1] = OCEAN_COLOR[1];
-				correct_color[2] = OCEAN_COLOR[2];
-			}
-			
-			assert(abs(cast(byte)(correct_color[0]) - pixels[0]) < 2); // Error of margin is because the values are slightly off, possibly compression, could be gamma...  Not sure.
-			assert(abs(cast(byte)(correct_color[1]) - pixels[1]) < 2);
-			assert(abs(cast(byte)(correct_color[2]) - pixels[2]) < 2);
+			assert(abs(cast(byte)(ocean_color[0]) - pixels[0]) < 2); // Error of margin is because the values are slightly off, possibly compression, could be gamma...  Not sure.
+			assert(abs(cast(byte)(ocean_color[1]) - pixels[1]) < 2);
+			assert(abs(cast(byte)(ocean_color[2]) - pixels[2]) < 2);
 		}
 	}
 	body {
