@@ -184,7 +184,7 @@ void gatherRegionTiles(RegionData[] region_data, string temp_tile_path, string n
 	}
 
 /// Creates super-tile zoom levels, but only those that contain at least one region, and limited in depth by max_zoom_level.
-void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_tile_path, string temp_tile_path, string filename_format)
+void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_tile_path, string temp_tile_path, string filename_format, ubyte[3] ocean_color)
 	in {
 		{
 			scope(failure) err(LGRP_APP, "Invalid path passed to createZoomLevels: '", new_tile_path, "'");
@@ -210,7 +210,7 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 		StopWatch sw;
 		sw.start();
 		
-		Color background_color =  new ColorRGB(0, 255, 255, 255);
+		Color background_color =  new ColorRGB(ocean_color[0], ocean_color[1], ocean_color[2], 255);
 		TileTree[string] full_list; // Stores every single TileTree element created by the below.  If this can be discarded in favor of some form of pointer magic in the actual elements so much the better.
 		
 		string[] top_layer; // The uppermost layer of the pyramid. Contains string indices into the full_list.

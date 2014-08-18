@@ -231,7 +231,7 @@ int main(string[] args) {
 			assert(config_document["highest_zoom_level"].type == JSON_TYPE.INTEGER);
 			assert(config_document["highest_zoom_level"].integer() >= 0);
 			
-			max_zoom_level = config_document["ocean_color"].array[0].integer();
+			max_zoom_level = cast(uint)(config_document["ocean_color"].array[0].integer());
 			
 			chatter(LGRP_APP, "Using highest zoom level from config file: ", max_zoom_level);
 		}
@@ -281,7 +281,7 @@ int main(string[] args) {
 	gatherRegionTiles(region_data, temp_tile_path, new_tile_path, map_tile_path, filename_format ~ "." ~ filename_ext);
 	
 	// Create the zoom levels.
-	createZoomLevels(region_data, max_zoom_level, new_tile_path, temp_tile_path, filename_format ~ "." ~ filename_ext);
+	createZoomLevels(region_data, max_zoom_level, new_tile_path, temp_tile_path, filename_format ~ "." ~ filename_ext, ocean_color);
 	
 	// Move the temp folder onto the map folder, overwriting the folder.  This is to be as atomic as possible to help prevent read problems.. though there could still be some...
 	if (map_tile_path.exists()) {
