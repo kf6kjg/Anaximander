@@ -48,6 +48,7 @@ import dmagick.Image;
 import alogger;
 import aregiondata;
 
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Constants
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -57,6 +58,7 @@ private const string LGRP_APP = "tilegrabber";
 private const uint IMG_WIDTH = 256;
 private const uint IMG_HEIGHT = 256;
 private const ubyte[] OCEAN_COLOR = [ 1, 11, 252 ];
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Functions
@@ -164,7 +166,7 @@ void createOceanTile(JSONValue[string] config_document, string map_tile_path, st
 		tile.write(filename);
 	}
 
-void gatherRegionTiles(RegionData[] region_data, string temp_tile_path, string new_tile_path, string filename_format)
+void gatherRegionTiles(RegionData[] region_data, string temp_tile_path, string new_tile_path, string map_tile_path, string filename_format)
 	in {
 		{
 			scope(failure) err(LGRP_APP, "Invalid path passed to gatherRegionTiles: '", temp_tile_path, "'");
@@ -177,6 +179,12 @@ void gatherRegionTiles(RegionData[] region_data, string temp_tile_path, string n
 			assert(new_tile_path.length > 0);
 			assert(new_tile_path.isValidPath());
 			assert(new_tile_path.isDir());
+		}
+		{
+			scope(failure) err(LGRP_APP, "Invalid path passed to gatherRegionTiles: '", map_tile_path, "'");
+			assert(map_tile_path.length > 0);
+			assert(map_tile_path.isValidPath());
+			assert(map_tile_path.isDir());
 		}
 		{
 			scope(failure) err(LGRP_APP, "Invalid file name format passed to gatherRegionTiles: '", filename_format, "'");
@@ -201,12 +209,12 @@ void gatherRegionTiles(RegionData[] region_data, string temp_tile_path, string n
 		foreach (region; parallel(region_data, 1)) {
 			string filename = filename_format.format(region.x, region.y, 1).baseName();
 			
-			string source = buildNormalizedPath(temp_tile_path, filename);
-			string dest = buildNormalizedPath(new_tile_path, filename);
+			string source = buildNormalizedPath(map_tile_path, filename);
+			string dest = buildNormalizedPath(temp_tile_path, filename);
 			
 			// If already there don't overwrite as what's there is the newest.
 			if (!dest.exists() && source.exists()) {
-				source.rename(dest);
+				source.copy(dest);
 			}
 		}
 	}

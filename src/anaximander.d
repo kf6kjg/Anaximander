@@ -226,7 +226,7 @@ int main(string[] args) {
 	createOceanTile(config_document, temp_tile_path, filename_ext);
 	
 	// Organize the files into one place for the zoom level build.
-	gatherRegionTiles(region_data, temp_tile_path, new_tile_path, filename_format ~ "." ~ filename_ext);
+	gatherRegionTiles(region_data, temp_tile_path, new_tile_path, map_tile_path, filename_format ~ "." ~ filename_ext);
 	
 	
 	// Move the temp folder onto the map folder, overwriting the folder.  This is to be as atomic as possible to help prevent read problems.. though there could still be some...
