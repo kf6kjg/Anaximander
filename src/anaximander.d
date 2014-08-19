@@ -62,13 +62,13 @@ private const string LGRP_APP = "app";
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int main(string[] args) {
-	string config_file = "./anaximander.json"; /// Where in the world is the config file?
+	string config_file = "../etc/anaximander.json"; /// Where in the world is the config file?
 	JSONValue[string] config_document;
 	
 	// Optional config entries with default values.
-	string new_tile_path = "./newtiles"; /// The path for the tiles that yet need processing.
-	string map_tile_path = "./maptiles"; /// The final output location for all finished tiles.
-	string temp_tile_path = "./maptiles.temp"; /// Staging ground for tiles.
+	string new_tile_path = "../newtiles"; /// The path for the tiles that yet need processing.
+	string map_tile_path = "../maptiles"; /// The final output location for all finished tiles.
+	string temp_tile_path = "../maptiles.temp"; /// Staging ground for tiles.
 	string filename_format = "%d-%d-%d";
 	string filename_ext = "jpg";
 	ubyte[3] ocean_color = [ 1, 11, 252 ];
@@ -131,6 +131,11 @@ Command line parameters:
   -v, --verbose      Shorthand for --logging=VERBOSE
   -V, --version      Prints the version string.  The version is a simple
                        date-stamp of when the executable was compiled.
+
+Config file:
+By default the config file is read from
+  {path_to_executable}/../etc/anaximander.json
+The config file is in JSON format and is internally documented.
 
 Paths note:
 Options that specify a file can be given in either relative or absolute

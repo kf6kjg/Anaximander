@@ -11,9 +11,12 @@ set version=%version:~0,4%%version:~4,2%%version:~6,2%%version:~8,2%
 rem Process the version module to add the results into the source tree.
 powershell.exe "(Get-Content src/aversioninfo.d.in) | ForEach-Object { $_ -replace '@VERSION@', '%version%' } | Set-Content src/aversioninfo.d"
 
+rem Create the needed folders
+if NOT EXIST bin mkdir bin
+if NOT EXIST lib mkdir lib
+
 rem Download the libraries and then complain to the user to extract them into the lib directory.
 set needsextract=0
-if NOT EXIST lib mkdir lib
 cd lib
 echo Gathering libraries, if any...
 
@@ -21,10 +24,10 @@ if NOT EXIST curl.zip (
 	echo * Downloading curl library...
 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://downloads.dlang.org/other/curl-7.28.1-devel-rainer.win64.zip', '.\curl.zip')"
 	set needsextract=1
-) else if NOT EXIST ..\libcurl.dll (
+) else if NOT EXIST ..\bin\libcurl.dll (
 	if EXIST libcurl.dll (
 		echo * Gathering libcurl DLL to binary folder...
-		copy libcurl.dll ..\libcurl.dll
+		copy libcurl.dll ..\bin\libcurl.dll
 	) else (
 		msg "%username%" It seems you have not extracted the curl zip file correctly.  Please make sure libcurl.dll is placed in this folder.
 		exit /B
@@ -60,9 +63,9 @@ if NOT EXIST ImageMagick.zip (
 		cd ..\..
 		exit /B
 	) else (
-		if NOT EXIST ..\..\CORE_RL_magick_.dll (
+		if NOT EXIST ..\..\bin\CORE_RL_magick_.dll (
 			echo * Gathering ImageMagick DLLs to binary folder...
-			copy VisualMagick\bin\*.dll ..\..
+			copy VisualMagick\bin\*.dll ..\..\bin
 			echo * Gathering ImageMagick lib file to library folder...
 			copy VisualMagick\lib\CORE_RL_magick_.lib ..
 		)
@@ -75,7 +78,7 @@ if NOT EXIST DMagick.zip (
 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'https://github.com/kf6kjg/DMagick/archive/master.zip', '.\DMagick.zip')"
 	set needsextract=1
 ) else if NOT EXIST dmagick (
-	echo * Gathering mysql library to imports folder...
+	echo * Gathering DMagick library to imports folder...
 	mkdir dmagick
 	xcopy /E DMagick-master\dmagick dmagick
 )
@@ -97,4 +100,4 @@ if %needsextract%==1 (
 
 rem Compile the program
 echo Generating docs and compiling...
-rdmd -w -od. --build-only -m64 -Dddoc -cov -unittest -version=DMagick_No_Display -Ilib lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
+rdmd -w -odbin --build-only -m64 -Dddoc -cov -unittest -version=DMagick_No_Display -Ilib lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
