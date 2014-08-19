@@ -58,29 +58,35 @@ enum LOG_TYPE {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 LOG_LEVEL gLogLevel = LOG_LEVEL.NORMAL;
-string gLogFile = "./anaximander.log";
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // Functions
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/// Core logging function.
-void log(Args...)(LOG_LEVEL level, LOG_TYPE type, string group, Args values) {
-	if (level >= gLogLevel) {
-		auto now = (cast(DateTime)(Clock.currTime())).toISOString(); // Local time.
-		
-		switch (type) {
-			case LOG_TYPE.WARNING:
-				stderr.writeln(now, "[", group, "]W: ", values);
-			break;
-			case LOG_TYPE.ERROR:
-				stderr.writeln(now, "[", group, "]E: ", values);
-			break;
-			default:
-				writeln(now, "[", group, "]N: ", values);
+/// Core logging function.  Please use one of the other logging functions.
+private void log(Args...)(LOG_LEVEL level, LOG_TYPE type, string group, Args values)
+	in {
+		{
+			scope(failure) stderr.writeln("Attempted to log against a non-valid group title: '", group, "'");
+			assert(group.length > 0);
 		}
 	}
-}
+	body {
+		if (level >= gLogLevel) {
+			auto now = (cast(DateTime)(Clock.currTime())).toISOString(); // Local time.
+			
+			switch (type) {
+				case LOG_TYPE.WARNING:
+					stderr.writeln(now, "[", group, "]W: ", values);
+				break;
+				case LOG_TYPE.ERROR:
+					stderr.writeln(now, "[", group, "]E: ", values);
+				break;
+				default:
+					writeln(now, "[", group, "]N: ", values);
+			}
+		}
+	}
 
 /// Alias for log(LOG_LEVEL.NORMAL, LOG_TYPE.NORMAL, group, values);
 void info(Args...)(string group, Args values) {

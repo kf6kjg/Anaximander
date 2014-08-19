@@ -91,7 +91,6 @@ int main(string[] args) {
 		"config", &config_file,
 		"gettiles", &do_call_get_tiles,
 		"help",&do_help,
-		"logfile|l", &gLogFile,
 		"logging|L", &gLogLevel,
 		"quiet|q", function(){ gLogLevel = LOG_LEVEL.QUIET; },
 		"verbose|v", function(){ gLogLevel = LOG_LEVEL.VERBOSE; },
@@ -126,7 +125,6 @@ Command line parameters:
   --gettiles          Request the system to download tiles from the region
                         servers first thing.
   --help              This help.
-  -l, --logfile=file  Output log file location.  See note about paths.
   -L, --logging=LEVEL  Specifies the log verbosity.  Must be one of:
                          DEBUG     - Debugging messages only.
                          VERBOSE   - Helpful, if a mite chatty, messages.
