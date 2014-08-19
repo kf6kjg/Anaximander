@@ -13,6 +13,7 @@ powershell.exe "(Get-Content src/aversioninfo.d.in) | ForEach-Object { $_ -repla
 
 rem Create the needed folders
 if NOT EXIST bin mkdir bin
+if NOT EXIST imports mkdir imports
 if NOT EXIST lib mkdir lib
 
 rem Download the libraries and then complain to the user to extract them into the lib directory.
@@ -38,10 +39,10 @@ if NOT EXIST mysql-native.zip (
 	echo * Downloading mysql library...
 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'https://github.com/rejectedsoftware/mysql-native/archive/v0.0.15.zip', '.\mysql-native.zip')"
 	set needsextract=1
-) else if NOT EXIST mysql (
+) else if NOT EXIST ..\imports\mysql (
 	echo * Gathering mysql library to imports folder...
-	mkdir mysql
-	xcopy /E mysql-native-0.0.15\source\mysql mysql
+	mkdir ..\imports\mysql
+	xcopy /E mysql-native-0.0.15\source\mysql ..\imports\mysql
 )
 
 rem Requirement for DMagick
@@ -77,10 +78,10 @@ if NOT EXIST DMagick.zip (
 	echo * Downloading DMagick library...
 	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'https://github.com/kf6kjg/DMagick/archive/master.zip', '.\DMagick.zip')"
 	set needsextract=1
-) else if NOT EXIST dmagick (
+) else if NOT EXIST ..\imports\dmagick (
 	echo * Gathering DMagick library to imports folder...
-	mkdir dmagick
-	xcopy /E DMagick-master\dmagick dmagick
+	mkdir ..\imports\dmagick
+	xcopy /E DMagick-master\dmagick ..\imports\dmagick
 )
 
 
@@ -100,4 +101,4 @@ if %needsextract%==1 (
 
 rem Compile the program
 echo Generating docs and compiling...
-rdmd -w -odbin --build-only -m64 -Dddoc -cov -unittest -version=DMagick_No_Display -Ilib lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
+rdmd -w -odbin --build-only -m64 -Dddoc -cov -unittest -version=DMagick_No_Display -Iimports lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d

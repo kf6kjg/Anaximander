@@ -39,3 +39,4 @@ doc/
 *.dll
 src/aversioninfo.d
 lib/
+imports/
