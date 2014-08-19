@@ -77,6 +77,9 @@ int main(string[] args) {
 	// Track whether or not the download process needs to happen.
 	bool do_call_get_tiles = false;
 	
+	// Track whether or not help listing was called.
+	bool do_help = false;
+	
 	StopWatch sw;
 	sw.start();
 	
@@ -87,11 +90,22 @@ int main(string[] args) {
 		std.getopt.config.bundling,
 		"config", &config_file,
 		"gettiles", &do_call_get_tiles,
+		"help",&do_help,
 		"logfile|l", &gLogFile,
 		"logging|L", &gLogLevel,
 		"quiet|q", function(){ gLogLevel = LOG_LEVEL.QUIET; },
 		"verbose|v", function(){ gLogLevel = LOG_LEVEL.VERBOSE; },
 	);
+	
+	if (do_help) {
+		// Make sure the welcome is printed
+		if (gLogLevel > LOG_LEVEL.NORMAL) {
+			gLogLevel = LOG_LEVEL.NORMAL;
+		}
+		
+		// And the version.
+		args ~= "-V";
+	}
 	
 	// A friendly welcome.
 	info(LGRP_APP, "Anaximander the Grid Cartographer at your service!");
@@ -104,10 +118,64 @@ int main(string[] args) {
 		"version|V", function(){ stdout.writefln(" Version %d", VERSION); },
 	);
 	
+	if (do_help) {
+		writeln(q"EOS
+
+Command line parameters:
+  --config=file       Specify a config file path.  See note about paths.
+  --gettiles          Request the system to download tiles from the region
+                        servers first thing.
+  --help              This help.
+  -l, --logfile=file  Output log file location.  See note about paths.
+  -L, --logging=LEVEL  Specifies the log verbosity.  Must be one of:
+                         DEBUG     - Debugging messages only.
+                         VERBOSE   - Helpful, if a mite chatty, messages.
+                         NORMAL    - Only helpful messages.  Default.
+                         QUIET     - Should be pretty quiet.
+  -q, --quiet        Shorthand for --logging=QUIET
+  -v, --verbose      Shorthand for --logging=VERBOSE
+  -V, --version      Prints the version string.  The version is a simple
+                       date-stamp of when the executable was compiled.
+
+Paths note:
+Options that specify a file can be given in either relative or absolute
+notation.  Absolute paths will be read as given, but relative paths will be
+read as if given from the executable's location.  For example:
+  In Microsoft Windows(R):
+    C:\folder\file
+  In Unix-based/cloned systems such as Apple OSX(R) or Linux:
+    /folder/file
+ These will be accessed as given. However:
+  In Microsoft Windows(R):
+    If the anaximander executable was at: C:\anaximander\anaximander.exe
+    folder\file  would become  C:\anaximander\folder\file
+  In Unix-based/cloned systems such as Apple OSX(R) or Linux:
+    If the anaximander executable was at:
+      /usr/local/bin/anaximander/anaximander
+    folder/file  would become  /usr/local/bin/anaximander/folder/file
+
+Exit status:
+ 0  if OK,
+ All other values indicate an error condition.
+
+Please report bugs to the issue tracker:
+  https://github.com/kf6kjg/Anaximander/issues
+
+Contributions welcome - though I'd prefer a heads up via the issue tracker so
+that effort isn't wasted and people with similar needs can be pointed at
+each other to produce even better results.
+
+In case you were curious: Anaximander is one of, if not the, earliest known
+cartographers - a map maker in Greece.
+EOS"
+		);
+		return 0;
+	}
+	
 	// Verify the config path is sane.
 	if (!config_file.isValidPath()) {
 		err(LGRP_APP, "Invalid configuration file path: ", config_file);
-		return -1;
+		return 1;
 	}
 	
 	// Normallize the config file path to the executable location if a relative path.
@@ -127,12 +195,12 @@ int main(string[] args) {
 		}
 		catch (Exception) {
 			err(LGRP_APP, "Invalid config file [", config_file, "]: Error parsing JSON format. Cannot continue without config file due to required entries.");
-			return -1;
+			return 1;
 		}
 	}
 	catch (Exception) {
 		err(LGRP_APP, "Config file not found [", config_file, "]. Cannot continue without config file due to required entries.");
-		return -1;
+		return 1;
 	}
 	
 	// Process config data.
