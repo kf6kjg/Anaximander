@@ -123,11 +123,14 @@ void getRegionTiles(RegionData[] region_data, string new_tile_path, string filen
 	body {
 		StopWatch sw;
 		sw.start();
+		scope(exit) {
+			sw.stop();
+			chatter(LGRP_APP, "Download took ", sw.peek().seconds, " seconds for ", region_data.length, " regions, resulting in ", cast(double)(sw.peek().seconds) / region_data.length, " seconds per region on average.");
+		}
+		
 		foreach (rd; parallel(region_data, 1)) {
 			getTileFromServer(rd.url, rd.x, rd.y, new_tile_path, filename_format, file_ext);
 		}
-		sw.stop();
-		chatter(LGRP_APP, "Download took ", sw.peek().seconds, " seconds for ", region_data.length, " regions, resulting in ", cast(double)(sw.peek().seconds) / region_data.length, " seconds per region on average.");
 	}
 
 /**

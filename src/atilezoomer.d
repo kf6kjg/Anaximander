@@ -209,6 +209,10 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 	body {
 		StopWatch sw;
 		sw.start();
+		scope(exit) {
+			sw.stop();
+			chatter(LGRP_APP, "Super tile generation took ", sw.peek().msecs, " milliseconds for ", full_list.length - region_data.length, " super tiles, resulting in ", cast(double)(sw.peek().msecs) / (full_list.length - region_data.length), " milliseconds per super tile on average.");
+		}
 		
 		Color background_color =  new ColorRGB(ocean_color[0], ocean_color[1], ocean_color[2], 255);
 		TileTree[string] full_list; // Stores every single TileTree element created by the below.  If this can be discarded in favor of some form of pointer magic in the actual elements so much the better.
@@ -365,9 +369,6 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 				to_visit.popBack();
 			}
 		}
-		
-		sw.stop();
-		chatter(LGRP_APP, "Super tile generation took ", sw.peek().msecs, " milliseconds for ", full_list.length - region_data.length, " super tiles, resulting in ", cast(double)(sw.peek().msecs) / (full_list.length - region_data.length), " milliseconds per super tile on average.");
 	}
 
 

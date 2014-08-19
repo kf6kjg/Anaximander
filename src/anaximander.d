@@ -80,9 +80,6 @@ int main(string[] args) {
 	// Track whether or not help listing was called.
 	bool do_help = false;
 	
-	StopWatch sw;
-	sw.start();
-	
 	// Process commandline parameters.
 	getopt(args,
 		std.getopt.config.caseSensitive,
@@ -320,10 +317,17 @@ EOS"
 	}
 	
 	
+	// Start accounting the execution time.
+	StopWatch sw;
+	sw.start();
+	scope(exit) {
+		sw.stop();
+		info(LGRP_APP, "Program took ", sw.peek().seconds, " seconds.");
+	}
+	
 	// Get the list of active regions.
 	RegionData[] region_data = getRegionsFromDatabase(config_document["database_connection"].str);
 	// This has to be done every process because only the database only contains the master list of online regions.
-	
 	
 	// If requested, gather tiles from regions.
 	if (do_call_get_tiles) {
@@ -362,9 +366,6 @@ EOS"
 		chatter(LGRP_APP, "Moving the temp folder to the map folder location as the latter doesn't exist.");
 		temp_tile_path.rename(map_tile_path);
 	}
-	
-	sw.stop();
-	info(LGRP_APP, "Program took ", sw.peek().seconds, " seconds.");
 	
 	return 0;
 }
