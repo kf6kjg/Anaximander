@@ -322,6 +322,18 @@ EOS"
 	}
 	
 	
+	// Make sure all but the temp folder exist; the temp folder will be handled later.
+	if (!new_tile_path.exists()) {
+		scope(failure) err(LGRP_APP, "Unable to create/modify requested folder: ", new_tile_path);
+		new_tile_path.mkdirRecurse();
+	}
+	
+	if (!map_tile_path.exists()) {
+		scope(failure) err(LGRP_APP, "Unable to create/modify requested folder: ", map_tile_path);
+		map_tile_path.mkdirRecurse();
+	}
+	
+	
 	// Start accounting the execution time.
 	StopWatch sw;
 	sw.start();
