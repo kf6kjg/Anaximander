@@ -42,6 +42,7 @@ import std.parallelism;
 import std.string;
 
 // Library imports.  Keep sorted.
+import dmagick.Image;
 import mysql.connection;
 
 // Local imports.  Keep sorted.
@@ -164,23 +165,28 @@ void getTileFromServer(string url, uint x_coord, uint y_coord, string new_tile_p
 	}
 	out {
 		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1) ~ "." ~ file_ext;
+		Image file;
 		
 		{
 			scope(failure) err(LGRP_APP, "Failed to create tile from server. File: '", filename, "', URL: ", url);
 			assert(filename.exists());
 			assert(DirEntry(filename).size > 0);
+			file = new Image(filename);
 		}
 		{
-			scope(failure) err(LGRP_APP, "File on disk has wrong magic number. Corrupted download? File: '", filename, "', URL: ", url);
-			ubyte[] correct_header = [0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00];
-			auto header = cast(ubyte[]) filename.read(correct_header.length);
-			assert(correct_header[0..1] == header[0..1]); // First two bytes are a constant.  Next two are not, so I ignore them.
-			assert(correct_header[4..$] == header[4..$]); // From the 5th byte to the null after "JFIF" everything is constant.
+			scope(failure) err(LGRP_APP, "File on disk has wrong format: '" ~ file.magick().toLower() ~ "' and is supposed to be '" ~ file_ext.toLower() ~ "'. Corrupted download? File: '", filename, "', URL: ", url);
+			string file_format = file.magick().toLower();
+			assert((file_format == file_ext.toLower()) || (file_ext.toLower() == "jpg" && file_format == "jpeg"));
 		}
 	}
 	body {
+		file_ext = file_ext.toLower();
+		
 		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1) ~ "." ~ file_ext;
-		chatter(LGRP_APP, "Grabbing tile from ", url, " and writing to ", filename);
-		download(url, filename);
-		// TODO: Issue 7: verify that it was in the specified format, and convert it if it wasn't.
+		
+		chatter(LGRP_APP, "Grabbing tile from ", url);
+		ubyte[] data = get!(AutoProtocol, ubyte)(url);
+		
+		chatter(LGRP_APP, "* Writing to ", filename);
+		(new Image(data)).write(filename); // Converts the format automagickally if needed.
 	}
