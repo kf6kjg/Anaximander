@@ -72,7 +72,7 @@ int main(string[] args) {
 	string filename_format = "%d-%d-%d";
 	string filename_ext = "jpg";
 	ubyte[3] ocean_color = [ 1, 11, 252 ];
-	uint max_zoom_level = 7;
+	uint max_zoom_level = 8;
 	
 	// Track whether or not the download process needs to happen.
 	bool do_call_get_tiles = false;

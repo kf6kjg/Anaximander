@@ -4,7 +4,7 @@
 		"  database_connection: REQUIRED the grid database connection string.",
 		"  ocean_tile_name: REQUIRED the name of the ocean tile without the extension.  Must not have any characters that would make it an invalid file name.",
 		
-		"  highest_zoom_level: OPTIONAL maximum zoom level that will be generated, with the first being the region tiles.  Default is 7 levels.",
+		"  highest_zoom_level: OPTIONAL maximum zoom level that will be generated, with the first being the region tiles.  Default is 8 levels.",
 		"  map_tile_path: OPTIONAL path to the folder where the tiles are stored for delivery to the clients.  Default is a folder named 'maptiles' one level up from the directory containing the executable.",
 		"  new_tile_path: OPTIONAL path to the folder where the updated tiles are stored.  Default is a folder named 'newtiles' one level up from the directory containing the executable.",
 		"  temp_tile_path: OPTIONAL path to the folder where the tiles are stored temporarily during a rebuild of the world tiles.  Default is a folder named 'maptiles.temp' one level up from the directory containing the executable.",
