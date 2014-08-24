@@ -15,7 +15,7 @@ imports_dir="${proj_dir}/imports"
 
 ## Get the version into the source
 # Get the version number
-version="$(date +%Y%M%d%H)"
+version="$(date +%Y%m%d%H)"
 
 # Process the version module to add the results into the source tree.
 sed "s/\@VERSION\@/$version/" "${src_dir}/aversioninfo.d.in" > "${src_dir}/aversioninfo.d"
