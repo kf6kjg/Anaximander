@@ -16,6 +16,6 @@
 		""
 	],
 	"ocean_tile_name": "ocean",
-	"temp_tile_path": "C:/Windows/Temp/Anaximander",
+	"database_connection": "host=localhost;port=3306;user=USERNAME;pwd=PASSWORD;db=DATABASE",
 	"eor":""
 }
