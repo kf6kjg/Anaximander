@@ -102,3 +102,12 @@ if %needsextract%==1 (
 rem Compile the program
 echo Generating docs and compiling...
 rdmd -w -odbin --build-only -m64 -Dddoc -cov -unittest -version=DMagick_No_Display -Iimports lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
+
+
+rem Create execution script
+echo "* Creating batch file for execution: ./anaximander.bat"
+echo @ECHO OFF > anaximander.bat
+echo bin\anaximander %%* >> anaximander.bat
+
+echo * To run anaximander:
+echo     ./anaximander.bat
