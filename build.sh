@@ -110,9 +110,9 @@ chmod u+x "${bin_dir}/anaximander"
 ## Create execution script
 echo "* Creating shell script for execution: ./anaximander.sh"
 echo -e "#!/bin/bash
-LD_LIBRARY_PATH=\"${lib_dir}\" \"${bin_dir}/anaximander\" \"\$@\"
-" > anaximander.sh
-chmod u+x anaximander.sh
+LD_LIBRARY_PATH=\"$(basename ${lib_dir})\" \"$(basename ${bin_dir})/anaximander\" \"\$@\"
+" > "${proj_dir}/anaximander.sh"
+chmod u+x "${proj_dir}/anaximander.sh"
 
 echo "* To run anaximander:"
 echo "  $ ./anaximander.sh"
