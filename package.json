@@ -1,0 +1,5 @@
+{
+	"dependencies": {
+		"mysql-native": ">=0.0.15"
+	}
+}

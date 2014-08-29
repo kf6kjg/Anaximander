@@ -23,12 +23,23 @@ Icon
 #.Trashes
 
 ### Linux ignores from https://github.com/github/gitignore/commit/91a1756d29131c38599af43e417b15a2340f7d6e
-#.*
+.*
 !.gitignore
 *~
+
+### Stuff produced by program test runs
+*.lst
+newtiles/
+maptiles/
 
 ### Custom ignores
 *.exe
 *.obj
 doc/
-*.lst
+*.dll
+src/aversioninfo.d
+lib/
+imports/
+bin/
+anaximander.*
+anaximander-*
