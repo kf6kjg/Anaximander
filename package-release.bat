@@ -8,7 +8,7 @@ for /F "usebackq tokens=1,2 delims==" %%i in (`wmic os get LocalDateTime /VALUE 
 set version=%version:~0,4%%version:~4,2%%version:~6,2%%version:~8,2%
 
 
-set package_name="anaximander-%version%"
+set package_name="anaximander-%version%-win64"
 
 set package_dir="%package_name%"
 

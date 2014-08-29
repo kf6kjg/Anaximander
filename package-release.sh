@@ -7,7 +7,7 @@ etc_dir="${proj_dir}/etc"
 
 version="$(date +%Y%m%d%H)"
 
-package_name="anaximander-${version}"
+package_name="anaximander-${version}-linux-x86-64"
 
 package_dir="${proj_dir}/${package_name}"
 
