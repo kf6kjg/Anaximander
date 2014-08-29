@@ -9,7 +9,7 @@
 		"  new_tile_path: OPTIONAL path to the folder where the updated tiles are stored.  Default is a folder named 'newtiles' one level up from the directory containing the executable.",
 		"  temp_tile_path: OPTIONAL path to the folder where the tiles are stored temporarily during a rebuild of the world tiles.  Default is a folder named 'maptiles.temp' one level up from the directory containing the executable.",
 		"  tile_name_format: OPTIONAL a string representing the printf-formating codes for a filename, without extension, that will be used for all tiles.  Three integers are passed to the formatter: region x, region y, zoom level.  Default is '%d-%d-%d'.",
-		"  tile_file_type: OPTIONAL the file type of the saved image tiles.  Available options: PNG, JPG, JPEG, TIFF, JP2, GIF, and jsut about any other format supported by ImageMagick.  Default is JPG.",
+		"  tile_file_type: OPTIONAL the file type of the saved image tiles.  Available options: PNG, JPG, JPEG, TIFF, JP2, GIF, and just about any other format supported by ImageMagick.  Default is JPG.",
 		"  ocean_color: OPTIONAL the color of the ocean, expressed as an array of red, green, and blue in a range from 0 to 255.  The default is: [ 1, 11, 252 ]",
 		
 		"Note: Relative paths are relative to the executable location.  See the --help flag of the executable for more information.",

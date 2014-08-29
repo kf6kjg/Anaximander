@@ -101,7 +101,7 @@ if [ ! -e "${imports_dir}/dmagick" ]; then (
 
 ## Compile the program
 echo "* Generating docs and compiling..."
-rdmd -w -od${bin_dir} --build-only -m64 -Dddoc -cov -version=DMagick_No_Display -Iimports -L-l:lib/libMagickCore-6.Q16.a -L-l:lib/libMagickWand-6.Q16.a -L-ljpeg -L-lgomp -L-lphobos2 -L-lcurl "${src_dir}/anaximander.d" || exit 1
+rdmd -w -od${bin_dir} --build-only -m64 -Dddoc -version=DMagick_No_Display -Iimports -L-l:lib/libMagickCore-6.Q16.a -L-l:lib/libMagickWand-6.Q16.a -L-ljpeg -L-lgomp -L-lphobos2 -L-lcurl "${src_dir}/anaximander.d" || exit 1
 # Note: getting the linker flags in the correct order often takes adding the -v flag to see the resulting linker command.
 
 chmod u+x "${bin_dir}/anaximander"

@@ -101,7 +101,7 @@ if %needsextract%==1 (
 
 rem Compile the program
 echo Generating docs and compiling...
-rdmd -w -odbin --build-only -m64 -Dddoc -cov -unittest -version=DMagick_No_Display -Iimports lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
+rdmd -w -odbin --build-only -m64 -Dddoc -unittest -version=DMagick_No_Display -Iimports lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
 
 
 rem Create execution script

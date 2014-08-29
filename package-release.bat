@@ -15,17 +15,23 @@ set package_dir="%package_name%"
 
 rem Prep.
 if EXIST "%package_dir%" (
-	del /SY "%package_dir%"
+	del /S /Q "%package_dir%"
 )
 mkdir "%package_dir%"
 
 rem Get the binaries and DLLs
 mkdir "%package_dir%\bin"
 xcopy /E "bin" "%package_dir%\bin"
+copy "%PROGRAMFILES(x86)%\Microsoft Visual Studio 10.0\VC\redist\x64\Microsoft.VC100.CRT\msvcr100.dll" "%package_dir%\bin"
+copy "%PROGRAMFILES(x86)%\Microsoft Visual Studio 10.0\VC\redist\x64\Microsoft.VC100.OpenMP\vcomp100.dll" "%package_dir%\bin"
+
 
 rem Get the config data
 mkdir "%package_dir%\etc"
 xcopy /E "etc" "%package_dir%\etc"
+
+rem Get the script
+copy anaximander.bat "%package_dir%"
 
 
 rem Tell the user to package the whole shooting match.
