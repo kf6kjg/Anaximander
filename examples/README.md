@@ -36,7 +36,7 @@ In UNIX clones such as Linux, you'll be wanting to set up a cronjob under the us
 
 ```
 # Set for once every week, Wednesday at midnight:
-0	0	*	*	3	/path/to/anaximander.sh --gettiles -v -V > /another/path/anaximander.log
+0	0	*	*	3	/path/to/anaximander.sh --gettiles -v -V >> /another/path/anaximander.log
 ```
 
 Note that stderr is not redirected to the file: this is so that the user will get an email if a crash-level error occurs.
