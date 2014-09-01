@@ -1,10 +1,6 @@
 nxinx can be used directly via setting the maptiles directory of Anaximander to your HTTP root directory, e.g. `/srv/www/map`, and setting the following options.
 
-You may need to enable rewrite by executing the following:
-
-And then restart Apache.
-
-# Using http.conf rules for Apache 2.4
+# Using rules for nginx
 This documents using a whole subdomain for the serving of the map tiles.  This is recommended, as you can then easily point the subdomain at any server, even a nice fast CDN, without having to change the URL in your grid's INI file.  However, you can easily change the following to work for a subdirectory of an existing domain - but I'll leave that as an exercise for the reader.
 
 There is a couple of fundamental assumptions: the `tile_name_format` of `anaximander.json` is as default, and the `tile_file_type` is also the default.
