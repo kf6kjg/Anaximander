@@ -6,7 +6,7 @@ For the history buffs: [Anaximander][] was an early Greek scholar and philosophe
 
 [InWorldz]: http://inworldz.com/
 [ImageMagick]: http://www.imagemagick.org/
-[OpenSimluator]: http://opensimulator.org/
+[OpenSimulator]: http://opensimulator.org/
 [wiki]: https://github.com/kf6kjg/Anaximander/wiki
 [Anaximander]: http://en.wikipedia.org/wiki/Anaximander
 
