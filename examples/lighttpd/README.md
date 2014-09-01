@@ -25,18 +25,18 @@ $HTTP["host"] =~ "(^|\.)worldmap\.DOMAIN_NAME$" {
 	
 	url.rewrite-repeat = (
 		 # Convert the ?x=X&y=Y&z=Z form into Z-X-Y form that comes from... I'm not sure.
-		"x=([0-9]+)&y=([0-9]+)&z=([0-9]+)" => "/$3-$1-$2",
+		"x=([0-9]+)&y=([0-9]+)&z=([0-9]+)" => "/map-$3-$1-$2-objects.jpg",
 		 # And catch all other ways of expressing the same, as query strings can be listed in any order: "xzy", "yxz", "yzx", "zxy", "zyx"
-		"x=([0-9]+)&z=([0-9]+)&y=([0-9]+)" => "/$2-$1-$3",
-		"y=([0-9]+)&x=([0-9]+)&z=([0-9]+)" => "/$3-$2-$1",
-		"y=([0-9]+)&z=([0-9]+)&x=([0-9]+)" => "/$2-$3-$1",
-		"z=([0-9]+)&x=([0-9]+)&y=([0-9]+)" => "/$1-$2-$3",
-		"z=([0-9]+)&y=([0-9]+)&x=([0-9]+)" => "/$1-$3-$2",
+		"x=([0-9]+)&z=([0-9]+)&y=([0-9]+)" => "/map-$2-$1-$3-objects.jpg",
+		"y=([0-9]+)&x=([0-9]+)&z=([0-9]+)" => "/map-$3-$2-$1-objects.jpg",
+		"y=([0-9]+)&z=([0-9]+)&x=([0-9]+)" => "/map-$2-$3-$1-objects.jpg",
+		"z=([0-9]+)&x=([0-9]+)&y=([0-9]+)" => "/map-$1-$2-$3-objects.jpg",
+		"z=([0-9]+)&y=([0-9]+)&x=([0-9]+)" => "/map-$1-$3-$2-objects.jpg",
 		
 		# Exercise for the reader: handle extra parameters getting mixed into the query string!
 		
 		 # Convert the Z-X-Y form into X-Y-Z.jpg - this form is what the viewer's world map goes looking for.
-		"^/([0-9]+)-([0-9]+)-([0-9]+)$" => "/$2-$3-$1.jpg",
+		"^/map-([0-9]+)-([0-9]+)-([0-9]+)-objects.jpg$" => "/$2-$3-$1.jpg",
 		
 		# And finally, if there's a blank being asked for, serve up the ocean.
 		"^/$" => "/ocean.jpg",

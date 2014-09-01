@@ -22,10 +22,10 @@ server {
 		root MAP_TILES_PATH;
 		
 		# Convert the ?x=X&y=Y&z=Z form into Z-X-Y form that comes from... I'm not sure.
-		rewrite ^/$ /$arg_z-$arg_x-$arg_y?;
+		rewrite ^/$ /map-$arg_z-$arg_x-$arg_y-objects.jpg?;
 		
-		# Convert the Z-X-Y form into X-Y-Z.jpg - this form is what the viewer's world map goes looking for.
-		rewrite ^/([0-9]+)-([0-9]+)-([0-9]+)$ /$2-$3-$1.jpg;
+		# Convert the map-Z-X-Y-objects.jpg form into X-Y-Z.jpg - this form is what the viewer's world map goes looking for.
+		rewrite ^/map-([0-9]+)-([0-9]+)-([0-9]+)-objects.jpg$ /$2-$3-$1.jpg;
 		
 		# And finally, if there's a blank being asked for, serve up the ocean.
 		rewrite ^/$ /ocean.jpg;

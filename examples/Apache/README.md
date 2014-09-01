@@ -36,24 +36,24 @@ Note: there are keys that need replacing in the below:
 		
 		# Convert the ?x=X&y=Y&z=Z form into Z-X-Y form
 		RewriteCond %{QUERY_STRING} x=([0-9]+)&y=([0-9]+)&z=([0-9]+) [NC]
-		RewriteRule ^$ %3-%1-%2 [QSD]
+		RewriteRule ^$ map-%3-%1-%2-objects.jpg [QSD]
 		
 		# And catch all other ways of expressing the same, as query strings can be listed in any order: "xzy", "yxz", "yzx", "zxy", "zyx"
 		RewriteCond %{QUERY_STRING} x=([0-9]+)&z=([0-9]+)&y=([0-9]+) [NC]
-		RewriteRule ^$ %2-%1-%3 [QSD]
+		RewriteRule ^$ map-%2-%1-%3-objects.jpg [QSD]
 		RewriteCond %{QUERY_STRING} y=([0-9]+)&x=([0-9]+)&z=([0-9]+) [NC]
-		RewriteRule ^$ %3-%2-%1 [QSD]
+		RewriteRule ^$ map-%3-%2-%1-objects.jpg [QSD]
 		RewriteCond %{QUERY_STRING} y=([0-9]+)&z=([0-9]+)&x=([0-9]+) [NC]
-		RewriteRule ^$ %2-%3-%1 [QSD]
+		RewriteRule ^$ map-%2-%3-%1-objects.jpg [QSD]
 		RewriteCond %{QUERY_STRING} z=([0-9]+)&x=([0-9]+)&y=([0-9]+) [NC]
-		RewriteRule ^$ %1-%2-%3 [QSD]
+		RewriteRule ^$ map-%1-%2-%3-objects.jpg [QSD]
 		RewriteCond %{QUERY_STRING} z=([0-9]+)&y=([0-9]+)&x=([0-9]+) [NC]
-		RewriteRule ^$ %1-%3-%2 [QSD]
+		RewriteRule ^$ map-%1-%3-%2-objects.jpg [QSD]
 		
 		# Exercise for the reader: handle extra parameters getting mixed into the query string!
 		
 		# Convert the Z-X-Y form into X-Y-Z.jpg - this form is what the viewer's world map goes looking for.
-		RewriteRule ^([0-9]+)-([0-9]+)-([0-9]+)$ /$2-$3-$1.jpg [PT,NC,QSD]
+		RewriteRule ^map-([0-9]+)-([0-9]+)-([0-9]+)-objects.jpg$ /$2-$3-$1.jpg [PT,NC,QSD]
 		
 		# And finally, if there's a blank being asked for, serve up the ocean.  DirectoryIndex causes conflicts with the query string rewrites above.
 		RewriteRule ^$ /ocean.jpg
