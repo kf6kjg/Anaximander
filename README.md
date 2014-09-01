@@ -1,40 +1,21 @@
-Map tile generator for [InWorldz][] servers using compiled D and the [ImageMagick][] library.
+Anaximander the Grid Cartographer is a map tile generator for [InWorldz][] and [OpenSimulator][] servers using compiled D and the [ImageMagick][] library, utilizing parallel processing and advanced tree data structures to generate only what is needed in as short a time as possible.
+
+For installation and building instructions, please see the [Anaximander wiki][wiki].
+
+For the history buffs: [Anaximander][] was an early Greek scholar and philosopher who is credited as being one of, if not the, first to draw a map of the world.
 
 [InWorldz]: http://inworldz.com/
 [ImageMagick]: http://www.imagemagick.org/
+[OpenSimluator]: http://opensimulator.org/
+[wiki]: https://github.com/kf6kjg/Anaximander/wiki
+[Anaximander]: http://en.wikipedia.org/wiki/Anaximander
 
-# Building source #
+# Supported operating systems
+At this time, only the following operating systems are being supported and tested:
 
-## Microsoft Windows ##
-Requires Windows 7 or newer due to dependency on Microsoft PowerShell 2 or newer. Requires [dmd][] to be on the PATH.
+* Ubuntu Linux 14.04 and newer
+* Microsoft Windows 7
+* Microsoft Windows Server 2008 R2
 
-1. Clone repository (or download source archive)
-2. Execute `build.bat` (preferably with the Command Prompt)
-3. If a Windows Explorer window opens and a message pops up, follow the instructions then repeat step 2.
-4. Test the resulting `anaximander.exe` with the Windows Command Prompt.
-
-[dmd]: http://dlang.org/dmd-windows.html
-
-## Linux ##
-Requires wget, unzip, and dmd to all be on the PATH.
-
-1. Clone repository (or download source archive)
-2. Install requirements: (If you skip this step the build script will tell you how to continue.)
-  * libcurl
-  * libjpeg
-3. Set the build script executable:
-    ```bash
-    chmod u+x build.sh
-    ```
-4. Execute the build script:
-    ```bash
-    ./build.sh
-    ```
-5. Wait a while...
-6. Test the resulting shell script to run the program:
-    ```bash
-    ./anaximander.sh
-    ```
-
-## Apple OSX ##
-I'm sorry, but OSX is not supported at this time.  Open source contributions are very welcome.  While I use a Mac myself, this program was developed because the original PHP scripts were not only very slow, but they were Linux-only and I had a need for a version that would run under Windows Server.  This kills two birds with one stone, but the third got away because I wasn't aiming for him!
+Open source contributions are very welcome - especially as regards testing on other operating systems.
+For Apple OS lovers: while I use a Mac myself, this program was developed because the original PHP scripts were not only very slow, but they were Linux-only and I had a need for a version that would run under Windows Server.  This kills two birds with one stone, but the third got away because I wasn't aiming for him!
