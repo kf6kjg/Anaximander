@@ -11,22 +11,40 @@ The folder the map server is getting the map image tiles from is rebuilt by Anax
 
 This overwriting of the folder means that the document root of your web site needs to be in a place Anaximander can have complete control over.  Be sure to take this into account when designating where on the filesystem you are placing it and the permissions involved.
 
-# Configuring the grid for a world map
-Once you've set up web site for hosting the map tiles, you can add the url to the grid configuration file, which will be either `OpenSim.ini` or `Robust.ini` depending on which grid server you are running and its version.
+# Configuring for a world map
+Once you've set up web site for hosting the map tiles, you can add the url to the correct configuration file. Which file and what setting depends on how your system is set up.
 
-If you are working with `OpenSim.ini` then you'll be looking for the `MapImageServerURI` key and setting it to your map domain like so:
+Of course you'll need to replace `example.com` with your domain.
+
+## Standalone mode (Halcyon)
+Open either `Halcyon.ini`, `OpenSim.ini`. or `Robust.ini` depending on which grid server you are running and its version.
+
+If you are working with `Halcyon.ini` then you'll be looking for the `[StandAlone]` section and setting  the `map_server_uri` key to your map domain like so:
+
+```INI
+map_server_uri = "http://worldmap.example.com"
+```
+
+## Grid mode (Halcyon)
+
+If you are working with `Halcyon.ini` then you'll be looking for the `[SimulatorFeatures]` section and setting `MapImageServerURI` key to your map domain, so that the map tiles get served to your user's minimaps, like so:
 
 ```INI
 MapImageServerURI = "http://worldmap.example.com"
 ```
 
+To show the map tiles for the world map, you will also need to set the `map_server_uri` attribute of the `UserServer_Config.xml` file:
+
+```XML
+map_server_uri="http://worldmap.example.com"
+```
+
+## Grid mode (OpenSim)
 If you are working with `Robust.ini` then you'll be looking for `MapTileURL` and setting it to your map domain, like so:
 
 ```INI
 MapTileURL = "http://worldmap.example.com"
 ```
-
-Of course you'll need to replace `example.com` with your domain.
 
 # Scheduling Anaximander
 Scheduling Anaximander to run regularly is particularly OS-specific, and has a lot of options depending on your set up.
