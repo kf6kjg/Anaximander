@@ -237,7 +237,7 @@ EOS"
 			chatter(LGRP_APP, "Using file format from config file: ", filename_format);
 		}
 		
-		// Get the tile file type, wich doubles as the file extention.
+		// Get the tile file type, wich doubles as the file extension.
 		if ("tile_file_type" in config_document) { // Optional config entry.
 			scope(failure) err(LGRP_APP, "Value for config key 'tile_file_type' MUST be a non-empty string!");
 			assert(config_document["tile_file_type"].type == JSON_TYPE.STRING);

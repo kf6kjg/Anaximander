@@ -114,7 +114,7 @@ void getRegionTiles(RegionData[] region_data, string new_tile_path, string filen
 			assert(filename_format.length > 0);
 		}
 		{
-			scope(failure) err(LGRP_APP, "Invalid file extention passed to getRegionTiles: '", file_ext, "'");
+			scope(failure) err(LGRP_APP, "Invalid file extension passed to getRegionTiles: '", file_ext, "'");
 			assert(file_ext.length > 0);
 		}
 	}
@@ -159,7 +159,7 @@ void getTileFromServer(string url, uint x_coord, uint y_coord, string new_tile_p
 			assert(filename_format.length > 0);
 		}
 		{
-			scope(failure) err(LGRP_APP, "Invalid file extention passed to getTileFromServer: '", file_ext, "'");
+			scope(failure) err(LGRP_APP, "Invalid file extension passed to getTileFromServer: '", file_ext, "'");
 			assert(file_ext.length > 0);
 		}
 	}

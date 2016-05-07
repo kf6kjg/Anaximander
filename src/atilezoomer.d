@@ -86,7 +86,7 @@ void createOceanTile(ubyte[3] ocean_color, string map_tile_path, string ocean_ti
 			assert(ocean_tile_file_name.isValidFilename());
 		}
 		{
-			scope(failure) err(LGRP_APP, "Invalid file extention passed to createOceanTile: '", file_ext, "'");
+			scope(failure) err(LGRP_APP, "Invalid file extension passed to createOceanTile: '", file_ext, "'");
 			assert(file_ext.length > 0);
 		}
 	}
