@@ -42,6 +42,8 @@ import std.parallelism;
 import std.string;
 
 // Library imports.  Keep sorted.
+import dmagick.ColorRGB;
+import dmagick.Geometry;
 import dmagick.Image;
 import mysql.connection;
 
@@ -55,6 +57,9 @@ import aregiondata;
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 private const string LGRP_APP = "tilegrabber";
+
+private const uint IMG_WIDTH = 256;
+private const uint IMG_HEIGHT = 256;
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -184,9 +189,22 @@ void getTileFromServer(string url, uint x_coord, uint y_coord, string new_tile_p
 		
 		string filename = new_tile_path ~ "/" ~ filename_format.format(x_coord, y_coord, 1) ~ "." ~ file_ext;
 		
-		chatter(LGRP_APP, "Grabbing tile from ", url);
-		ubyte[] data = get!(AutoProtocol, ubyte)(url);
+		bool image_was_written = false;
 		
-		chatter(LGRP_APP, "* Writing to ", filename);
-		(new Image(data)).write(filename); // Converts the format automagickally if needed.
+		try {
+			chatter(LGRP_APP, "Grabbing tile from ", url);
+			ubyte[] data = get!(AutoProtocol, ubyte)(url);
+			
+			chatter(LGRP_APP, "* Writing to ", filename);
+			(new Image(data)).write(filename); // Converts the format automagickally if needed.
+			image_was_written = true;
+		}
+		catch (CurlException e) {
+			err(LGRP_APP, "Error downloading tile from region at (", x_coord, ", ", y_coord, ") with URL ", url, " - Error is: ", e);
+		}
+		
+		if (!image_was_written) {
+			// Could not get an image from the server. Slam an alternate image in its place.
+			(new Image(Geometry(IMG_WIDTH, IMG_HEIGHT), new ColorRGB(255, 0, 0, 255))).write(filename); // TODO: Make this a configurable image not a hardcoded block of color!
+		}
 	}
