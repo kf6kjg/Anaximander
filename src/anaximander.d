@@ -339,7 +339,13 @@ EOS"
 	sw.start();
 	scope(exit) {
 		sw.stop();
-		info(LGRP_APP, "Program took ", sw.peek().seconds, " seconds.");
+		
+		if (sw.peek().seconds > 1) {
+			info(LGRP_APP, "Program took ", sw.peek().seconds, " seconds.");
+		}
+		else {
+			info(LGRP_APP, "Program took ", sw.peek().msecs, " milliseconds.");
+		}
 	}
 	
 	// Get the list of active regions.
