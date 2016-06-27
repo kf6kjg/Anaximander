@@ -208,6 +208,7 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 	}
 	body {
 		Color background_color = new ColorRGB(ocean_color[0], ocean_color[1], ocean_color[2], 255);
+		Color err_color = new ColorRGB(255, 0, 0, 255);
 		TileTree[string] full_list; // Stores every single TileTree element created by the below.  If this can be discarded in favor of some form of pointer magic in the actual elements so much the better.
 		
 		string[] top_layer; // The uppermost layer of the pyramid. Contains string indices into the full_list.
@@ -267,7 +268,7 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 			}
 		}
 		
-		//debug_log(LGRP_APP, "Tile tree: ", full_list);
+		debug_log(LGRP_APP, "Tile tree: ", full_list);
 		debug_log(LGRP_APP, "Top layer: ", top_layer);
 		// Build the tile images using a post-order depth-first algorithm on the above trees.
 		// Turns out this is not a trivial problem to solve.  Many thanks to Dave Remy: http://blogs.msdn.com/b/daveremy/archive/2010/03/16/non-recursive-post-order-depth-first-traversal.aspx
@@ -308,13 +309,23 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 					// Zoom 1 is the definition of a leaf.
 					string image_path = buildNormalizedPath(temp_tile_path, filename_format.format(branch.x, branch.y, branch.zoom));
 					debug_log(LGRP_APP, "* Leaf. Attempting to load ", image_path);
+					bool load_err = true;
 					try {
 						branch.tile_image = new Image(image_path);
-						debug_log(LGRP_APP, "** Loaded.");
+						debug_log(LGRP_APP, "** Loaded image of size ", branch.tile_image.columns, "x", branch.tile_image.rows);
+						load_err = false;
 					}
 					catch (Exception e) {
 						debug_log(LGRP_APP, "** Failure to load.");
-					} // If the file doesn't exist, then dinna worry 'bout it lad.
+					} // If the file doesn't exist, then dinna worry 'bout it lad: it'll be skipped for now, possibly picked up next time.
+					
+					if (load_err) { // Give the missing image a paint job!
+						branch.tile_image = new Image(Geometry(IMG_WIDTH, IMG_HEIGHT), err_color);
+						
+						// Save to disk.
+						debug_log(LGRP_APP, "** exporting error image to ", image_path);
+						branch.tile_image.write(image_path);
+					}
 				}
 				
 				debug_log(LGRP_APP, "* Looking into processing the image.");
