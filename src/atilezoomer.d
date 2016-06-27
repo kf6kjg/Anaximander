@@ -207,7 +207,7 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 		// Nothing to check as it is not guaranteed that ANY files will exist: the most degenerate valid case is that the grid has no regions.
 	}
 	body {
-		Color background_color =  new ColorRGB(ocean_color[0], ocean_color[1], ocean_color[2], 255);
+		Color background_color = new ColorRGB(ocean_color[0], ocean_color[1], ocean_color[2], 255);
 		TileTree[string] full_list; // Stores every single TileTree element created by the below.  If this can be discarded in favor of some form of pointer magic in the actual elements so much the better.
 		
 		string[] top_layer; // The uppermost layer of the pyramid. Contains string indices into the full_list.
@@ -219,7 +219,7 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 			chatter(LGRP_APP, "Super tile generation took ", sw.peek().msecs, " milliseconds for ", full_list.length - region_data.length, " super tiles, resulting in ", cast(double)(sw.peek().msecs) / (full_list.length - region_data.length), " milliseconds per super tile on average.");
 		}
 		
-		// Effeciency note: the below may be rank with copies and other resource wastage.  At this time I do not yet have the knowledgebase to discover them nor correct them.
+		// Efficiency note: the below may be rank with copies and other resource wastage.  At this time I do not yet have the knowledge base to discover them nor correct them.
 		
 		// Preload the algorithm with the region information.
 		foreach (region; region_data) {
@@ -267,14 +267,13 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 			}
 		}
 		
-		debug_log(LGRP_APP, "Tile tree: ", full_list);
+		//debug_log(LGRP_APP, "Tile tree: ", full_list);
 		debug_log(LGRP_APP, "Top layer: ", top_layer);
-		
 		// Build the tile images using a post-order depth-first algorithm on the above trees.
 		// Turns out this is not a trivial problem to solve.  Many thanks to Dave Remy: http://blogs.msdn.com/b/daveremy/archive/2010/03/16/non-recursive-post-order-depth-first-traversal.aspx
 		foreach (tree_index; top_layer) {
 			string[] to_visit;
-			string[] visted_ancestors;
+			string[] visited_ancestors;
 			to_visit ~= tree_index;
 			
 			while (to_visit.length > 0) {
@@ -291,8 +290,8 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 				}
 				
 				if (branch.children.length > 0) {
-					if (visted_ancestors.length == 0 || visted_ancestors.back() != branch_index) {
-						visted_ancestors ~= branch_index;
+					if (visited_ancestors.length == 0 || visited_ancestors.back() != branch_index) {
+						visited_ancestors ~= branch_index;
 						
 						// Append the child list, but in reverse.
 						foreach_reverse (child; branch.children) {
@@ -302,7 +301,7 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 						continue;
 					}
 					
-					visted_ancestors.popBack();
+					visited_ancestors.popBack();
 				}
 				
 				if (branch.zoom == 1) {
@@ -357,7 +356,6 @@ void createZoomLevels(RegionData[] region_data, uint max_zoom_level, string new_
 						offset_x,
 						offset_y
 					);
-					
 					
 					full_list[branch.parent].tile_image = compilation;
 				}
