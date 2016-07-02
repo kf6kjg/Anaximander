@@ -48,11 +48,11 @@ if NOT EXIST mysql-native.zip (
 rem Requirement for DMagick
 if NOT EXIST ImageMagick.zip (
 	echo * Downloading ImageMagick library...
-	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://www.imagemagick.org/download/windows/ImageMagick-windows.zip', '.\ImageMagick.zip')"
+	powershell.exe "(new-object System.Net.WebClient).DownloadFile( 'http://www.imagemagick.org/download/windows/releases/ImageMagick-6.8.9-10.7z', '.\ImageMagick.7z')"
 	set needsextract=1
 ) else (
 	cd ImageMagick-*
-	if NOT EXIST VisualMagick\bin\CORE_RL_magick_.dll (
+	if NOT EXIST VisualMagick\bin\CORE_RL_Magick++_.dll (
 		echo * Please configure and compile ImageMagick using Release mode 64bit Dynamic Multithreaded default settings.
 		start VisualMagick\configure\configure.sln
 		
@@ -64,11 +64,11 @@ if NOT EXIST ImageMagick.zip (
 		cd ..\..
 		exit /B
 	) else (
-		if NOT EXIST ..\..\bin\CORE_RL_magick_.dll (
+		if NOT EXIST ..\..\bin\CORE_RL_Magick++_.dll (
 			echo * Gathering ImageMagick DLLs to binary folder...
 			copy VisualMagick\bin\*.dll ..\..\bin
 			echo * Gathering ImageMagick lib file to library folder...
-			copy VisualMagick\lib\CORE_RL_magick_.lib ..
+			copy VisualMagick\lib\CORE_RL_Magick++_.lib ..
 		)
 	)
 	cd ..
@@ -94,14 +94,15 @@ cd ..
 if %needsextract%==1 (
 	echo Requesting user to extract libraries...
 	explorer.exe lib
-	msg "%username%" Please extract the zip files here.
+	msg "%username%" Please extract the archive files here.
 	echo * When done extracting, please execute the build command again!
+	echo * The program 7z (http://www.7-zip.org/download.html) may be needed for some of these archives.
 	exit /B
 )
 
 rem Compile the program
 echo Generating docs and compiling...
-rdmd -w -odbin --build-only -m64 -Dddoc -unittest -version=DMagick_No_Display -Iimports lib\CORE_RL_magick_.lib lib\curl.lib src\anaximander.d
+rdmd -w -odbin --build-only -m64 -Dddoc -unittest -version=DMagick_No_Display -Iimports lib\CORE_RL_Magick++_.lib lib\curl.lib src\anaximander.d
 
 
 rem Create execution script

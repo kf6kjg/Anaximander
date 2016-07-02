@@ -73,7 +73,7 @@ fi
 if [ ! -e "${lib_dir}"/libMagickCore-*.a ]; then (
 	echo "* Downloading ImageMagick library..."
 	mkdir -p "${lib_dir}/imagemagick"
-	wget -O- "http://www.imagemagick.org/download/ImageMagick.tar.xz" | tar -xJC "${lib_dir}/imagemagick" --strip-components=1 || exit 1
+	wget -O- "http://www.imagemagick.org/download/releases/ImageMagick-6.8.9-10.tar.xz" | tar -xJC "${lib_dir}/imagemagick" --strip-components=1 || exit 1
 	
 	# Build ImageMagick
 	echo "* Building ImageMagick.  This may take a while; go get something to eat, have a drink, sing a song, or whatever..."
@@ -92,7 +92,7 @@ if [ ! -e "${lib_dir}"/libMagickCore-*.a ]; then (
 if [ ! -e "${imports_dir}/dmagick" ]; then (
 	echo "* Downloading DMagick library..."
 	mkdir -p "${lib_dir}/dmagick"
-	wget -O- "https://github.com/MikeWey/DMagick/archive/master.tar.gz" | tar -xzC "${lib_dir}/dmagick" --strip-components=1 || exit 1
+	wget -O- "https://github.com/kf6kjg/DMagick/archive/master.tar.gz" | tar -xzC "${lib_dir}/dmagick" --strip-components=1 || exit 1
 	
 	echo "* Gathering DMagick library to imports folder..."
 	cp -R "${lib_dir}/dmagick/dmagick" "${imports_dir}/"
